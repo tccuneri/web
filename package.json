@@ -1,0 +1,12 @@
+{
+  "name": "tuning-crew-cuneri",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Custom web aplikacija za Tuning Crew Ćuneri bez third-party runtime paketa.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
