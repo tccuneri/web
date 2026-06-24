@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="hr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tuning Crew Ćuneri</title>
+    <meta name="description" content="Tuning Crew Ćuneri - hrvatski autoklub, članovi, susreti, mapa eventa i novosti." />
+    <link rel="icon" href="/assets/cuneri-logo.png" />
+    <link rel="stylesheet" href="/styles.css?v=12" />
+  </head>
+  <body>
+    <div id="loader" class="loader" aria-live="polite">
+      <div class="loader-logo"><img src="/assets/cuneri-logo.png" alt="Ćuneri" /></div>
+      <div class="loader-car">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <p>ĆUNERI TUNING CREW</p>
+    </div>
+
+    <header class="topbar">
+      <a class="brand" href="/" data-link aria-label="Tuning Crew Ćuneri">
+        <img src="/assets/cuneri-logo.png" alt="" />
+        <span>ĆUNERI</span>
+      </a>
+      <div class="top-actions">
+        <div class="header-account" id="headerAccount"><a href="/webshop-login" data-link aria-label="Prijava"><span class="person-icon">&#9679;</span><b>LOGIN</b></a></div>
+        <button class="lang active" data-lang="hr">HR</button>
+        <button class="lang" data-lang="en">EN</button>
+        <button class="hamburger" id="menuToggle" aria-label="Otvori meni" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <nav class="nav-panel" id="navPanel" aria-hidden="true">
+      <div class="nav-inner">
+        <a href="/" data-link><small>01</small><span data-i18n="nav.home">Naslovnica</span></a>
+        <a href="/clanovi" data-link><small>02</small><span data-i18n="nav.members">Članovi</span></a>
+        <a href="/maps" data-link><small>03</small><span data-i18n="nav.maps">Mapa susreta</span></a>
+        <a href="/povijest" data-link><small>04</small><span data-i18n="nav.history">Povijest</span></a>
+        <a href="/kontakt" data-link><small>05</small><span data-i18n="nav.contact">Kontakt</span></a>
+        <a href="/webshop" data-link><small>06</small><span>Webshop</span></a>
+        <div class="nav-mini">
+          <a href="/login-clanovi" data-link>LOGIN ZA CLANOVE</a>
+          <a href="/webshop-login" data-link>WEBSHOP LOGIN</a>
+        </div>
+      </div>
+    </nav>
+
+    <main id="app"></main>
+    <div id="toast" class="toast"></div>
+    <script src="/app.js?v=12"></script>
+  </body>
+</html>
