@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 620" role="img" aria-label="Colorful tuning meet lineup">
+  <defs>
+    <linearGradient id="m" y1="0" y2="1"><stop stop-color="#071116"/><stop offset=".55" stop-color="#14090f"/><stop offset="1" stop-color="#040505"/></linearGradient>
+  </defs>
+  <rect width="1400" height="620" fill="url(#m)"/>
+  <circle cx="250" cy="145" r="180" fill="#00d7ff" opacity=".14"/>
+  <circle cx="1080" cy="150" r="220" fill="#ff284c" opacity=".13"/>
+  <path d="M0 395 C220 350 350 372 560 360 C840 345 1045 370 1400 318 L1400 620 L0 620Z" fill="#12181b"/>
+  <g transform="translate(80 270) scale(.48)">
+    <path d="M60 170 L165 70 C232 18 385 20 545 40 C627 51 690 82 748 145 L828 174 C870 190 898 220 912 260 L870 295 L72 295 L28 260 C30 225 40 192 60 170Z" fill="#e8e9ec"/>
+    <circle cx="220" cy="296" r="70" fill="#030303"/><circle cx="725" cy="296" r="70" fill="#030303"/>
+    <path d="M35 245 L212 236 L270 268 L60 274Z" fill="#00d7ff"/>
+  </g>
+  <g transform="translate(450 255) scale(.58)">
+    <path d="M55 195 L205 77 C290 12 520 12 675 52 C755 72 812 106 865 165 L922 188 C955 202 977 230 990 270 L940 305 L70 305 L25 270 C28 235 38 210 55 195Z" fill="#b80a22"/>
+    <circle cx="250" cy="307" r="78" fill="#030303"/><circle cx="780" cy="307" r="78" fill="#030303"/>
+    <path d="M32 257 L230 250 L292 282 L58 288Z" fill="#fff6e7"/>
+  </g>
+  <g transform="translate(900 275) scale(.46)">
+    <path d="M54 170 L190 72 C260 22 455 16 625 46 C720 63 795 102 852 155 L930 185 C965 202 988 231 996 266 L950 300 L70 300 L28 262 C30 224 38 194 54 170Z" fill="#ffba52"/>
+    <circle cx="238" cy="302" r="76" fill="#020303"/><circle cx="790" cy="302" r="76" fill="#020303"/>
+    <path d="M35 250 L222 242 L290 275 L62 282Z" fill="#00d7ff"/>
+  </g>
+</svg>

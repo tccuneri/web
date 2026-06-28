@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" role="img" aria-label="Modified coupe">
+  <rect width="1000" height="700" fill="#09090b"/>
+  <circle cx="760" cy="155" r="210" fill="#ff284c" opacity=".16"/>
+  <path d="M65 475 C235 412 430 425 570 410 C750 390 850 425 950 455 L950 620 L65 620Z" fill="#151516"/>
+  <g transform="translate(80 245)">
+    <path d="M55 195 L205 77 C290 12 520 12 675 52 C755 72 812 106 865 165 L922 188 C955 202 977 230 990 270 L940 305 L70 305 L25 270 C28 235 38 210 55 195Z" fill="#b80a22"/>
+    <path d="M280 74 C375 43 545 42 664 65 C720 76 762 104 808 151 L235 154 C245 115 260 88 280 74Z" fill="#0a1318"/>
+    <path d="M135 185 C220 168 315 160 430 165" stroke="#f6f6f6" stroke-width="7"/>
+    <circle cx="250" cy="307" r="78" fill="#030303"/><circle cx="250" cy="307" r="45" fill="#1b2024" stroke="#fff" stroke-width="7"/>
+    <circle cx="780" cy="307" r="78" fill="#030303"/><circle cx="780" cy="307" r="45" fill="#1b2024" stroke="#fff" stroke-width="7"/>
+    <path d="M32 257 L230 250 L292 282 L58 288Z" fill="#fff6e7"/>
+  </g>
+</svg>

@@ -1,0 +1,203 @@
+[
+  {
+    "id": "a8398f07-8f2f-4e6d-870a-b09e8dd8abb9",
+    "to": "lukaveselak22@gmail.com",
+    "subject": "Cuneri webshop - reset lozinke",
+    "text": "Privremena lozinka: shop-1fc38604",
+    "createdAt": "2026-06-28T09:37:28.977Z",
+    "delivery": {
+      "status": "sent",
+      "updatedAt": "2026-06-28T09:37:30.480Z"
+    }
+  },
+  {
+    "id": "93fef447-a1dc-4175-a76e-e38691656d5a",
+    "to": "tccuneri@gmail.com",
+    "subject": "test",
+    "text": "Ime / Prezime: luka Veselak\nCompany: Nemam\nE-mail: lukaveselak22@gmail.com\n\nMessage:\nluka voli gabi",
+    "createdAt": "2026-06-28T09:36:53.487Z",
+    "delivery": {
+      "status": "sent",
+      "updatedAt": "2026-06-28T09:36:55.383Z"
+    }
+  },
+  {
+    "id": "f31e7165-e4ca-4f90-beb9-9d9be84867d5",
+    "to": "tccuneri@gmail.com",
+    "subject": "lukaveselak22@gmail.com",
+    "text": "Ime / Prezime: Petra Veselak Veselak\nCompany: test company\nE-mail: lukaveselak22@gmail.com\n\nMessage:\nddwdwddwdwdwdwwdwdwdwdwdwdwdwddwwdw",
+    "createdAt": "2026-06-26T06:45:49.419Z",
+    "delivery": {
+      "status": "sent",
+      "updatedAt": "2026-06-26T06:45:52.310Z"
+    }
+  },
+  {
+    "id": "57deb3a3-5c79-4b56-845c-87b846ac414f",
+    "to": "lukaveselak22@gmail.com",
+    "subject": "Tuning Crew Ćuneri pristup",
+    "text": "Email: lukaveselak22@gmail.com\nPrivremena lozinka: ulaz123ulaz\nNakon prijave moraš odmah promijeniti lozinku.",
+    "createdAt": "2026-06-25T13:50:43.356Z",
+    "delivery": {
+      "status": "sent",
+      "updatedAt": "2026-06-25T13:50:45.190Z"
+    }
+  },
+  {
+    "id": "ea4fe155-12c6-4b67-ba52-044f9d46c00a",
+    "to": "tccuneri@gmail.com",
+    "subject": "Nova Cuneri narudzba order-1855f4d690",
+    "text": "Nova narudzba: order-1855f4d690\nKupac: lukaveselak22@gmail.com\nUkupno: 17.91 EUR\nPlacanje: Pouzecem (Pouzecem)\n\nArtikli:\n1x Cuneri silterica (Crna) - 19.90 EUR\n\nDostava: Kucna adresa\nAdresa: Bregovita 44\nGrad: Brdovec\nPostanski broj: 10291\nNapomena: v\n\nPodaci za uplatu / racun:\nGrad: Brdovec\nUlica: Bregovita\nKucni broj: 44\nPostanski broj: 10291\nNapomena: v",
+    "createdAt": "2026-06-25T13:40:59.920Z",
+    "delivery": {
+      "status": "sent",
+      "updatedAt": "2026-06-25T13:41:01.154Z"
+    }
+  },
+  {
+    "id": "c2683e18-6eba-4763-bb9b-2b035bc3f2e7",
+    "to": "lukaveselak22@gmail.com",
+    "subject": "Cuneri narudzba order-1855f4d690",
+    "text": "Pozdrav Petra,\n\nNarudzba order-1855f4d690 je zaprimljena.\nUkupno: 17.91 EUR\nNacin placanja: Pouzecem\n\nPlacanje pouzecem obavlja se prilikom preuzimanja paketa.\n\nArtikli:\n1x Cuneri silterica (Crna) - 19.90 EUR\n\nDostava:\nDostava: Kucna adresa\nAdresa: Bregovita 44\nGrad: Brdovec\nPostanski broj: 10291\nNapomena: v\n\nPodaci za uplatu / racun:\nGrad: Brdovec\nUlica: Bregovita\nKucni broj: 44\nPostanski broj: 10291\nNapomena: v\n\nPovratno ces dobivati informacije o uplati, pripremi paketa i slanju.",
+    "createdAt": "2026-06-25T13:40:59.918Z",
+    "delivery": {
+      "status": "sent",
+      "updatedAt": "2026-06-25T13:41:01.509Z"
+    }
+  },
+  {
+    "id": "649b5289-970e-492c-b565-f1a39186b874",
+    "to": "lukaveselak22@gmail.com",
+    "subject": "Cuneri webshop - reset lozinke",
+    "text": "Privremena lozinka: shop-ba69d676",
+    "createdAt": "2026-06-25T13:38:24.047Z",
+    "delivery": {
+      "status": "sent",
+      "updatedAt": "2026-06-25T13:38:25.568Z"
+    }
+  },
+  {
+    "id": "e1e12ede-09ec-4a05-bdda-0b210d4ff42b",
+    "to": "tccuneri@gmail.com",
+    "subject": "Nova Cuneri narudzba order-121bc3f2a4",
+    "text": "Nova narudzba: order-121bc3f2a4\nKupac: kupac@example.com\nUkupno: 42.41 EUR\nPlacanje: PayPal (Ceka uplatu)\n\nArtikli:\n1x Cuneri hoodie (Zensko / Bijela / M) - 42.41 EUR\n\nDostava: Paketomat\nSluzba: BOX NOW\nBroj / oznaka paketomata: BN-123\nAdresa paketomata: Ulica Paketomata 1, Zagreb\n\nPodaci za uplatu / racun:\nGrad: Zagreb\nUlica: Ilica\nKucni broj: 12\nPostanski broj: 10000\nNapomena: Test napomena",
+    "createdAt": "2026-06-25T13:30:49.149Z",
+    "delivery": {
+      "status": "queued"
+    }
+  },
+  {
+    "id": "cb326af8-3a52-4bcb-b750-ddc7fe80e815",
+    "to": "kupac@example.com",
+    "subject": "Cuneri narudzba order-121bc3f2a4",
+    "text": "Pozdrav Luka,\n\nNarudzba order-121bc3f2a4 je zaprimljena.\nUkupno: 42.41 EUR\nNacin placanja: PayPal\n\nPayPal uplata: tccuneri@gmail.com\nU opis uplate obavezno upisi broj narudzbe: order-121bc3f2a4\n\nArtikli:\n1x Cuneri hoodie (Zensko / Bijela / M) - 42.41 EUR\n\nDostava:\nDostava: Paketomat\nSluzba: BOX NOW\nBroj / oznaka paketomata: BN-123\nAdresa paketomata: Ulica Paketomata 1, Zagreb\n\nPodaci za uplatu / racun:\nGrad: Zagreb\nUlica: Ilica\nKucni broj: 12\nPostanski broj: 10000\nNapomena: Test napomena\n\nPovratno ces dobivati informacije o uplati, pripremi paketa i slanju.",
+    "createdAt": "2026-06-25T13:30:49.132Z",
+    "delivery": {
+      "status": "queued"
+    }
+  },
+  {
+    "id": "0fd5389a-3820-4651-999f-97e3afb3ebb9",
+    "to": "lukaveselak22@gmail.com",
+    "subject": "Cuneri webshop - reset lozinke",
+    "text": "Privremena lozinka: shop-dfc4dfd4",
+    "createdAt": "2026-06-25T13:15:32.194Z",
+    "delivery": {
+      "status": "sent",
+      "updatedAt": "2026-06-25T13:15:34.093Z"
+    }
+  },
+  {
+    "id": "1b238253-b8f2-47e5-93fc-a632f6ab0d18",
+    "to": "tccuneri@gmail.com",
+    "subject": "Testing auta reply fixed",
+    "text": "Ime / Prezime: Luka Veselak\nCompany: Rimac\nE-mail: lukaveselak22@gmail.com\n\nMessage:\nluka\nvoli\n\nmacke\n\ni\naute",
+    "createdAt": "2026-06-25T13:12:05.448Z",
+    "delivery": {
+      "status": "sent",
+      "updatedAt": "2026-06-25T13:12:07.292Z"
+    }
+  },
+  {
+    "id": "a808f3b9-1bef-4a6a-a5e3-11e5b3f27289",
+    "to": "tccuneri@gmail.com",
+    "subject": "Testing auta",
+    "text": "Ime / Prezime: Luka Veselak\nCompany: Rimac\nE-mail: lukaveselak22@gmail.com\n\nMessage:\nluka\nvoli\n\nmacke\n\n\ni\naute",
+    "createdAt": "2026-06-25T13:10:49.183Z",
+    "delivery": {
+      "status": "sent",
+      "updatedAt": "2026-06-25T13:10:50.448Z"
+    }
+  },
+  {
+    "id": "121a2225-756a-446b-aebd-72c54e1457f7",
+    "to": "tccuneri@gmail.com",
+    "subject": "Subject Test ljepse",
+    "text": "Ime / Prezime: Luka Veselak\nCompany: XXXX\nE-mail: lukaveselak22@gmail.com\n\nMessage:\nMessage Test`nDrugi red poruke.",
+    "createdAt": "2026-06-25T13:10:00.129Z",
+    "delivery": {
+      "status": "sent",
+      "updatedAt": "2026-06-25T13:10:02.085Z"
+    }
+  },
+  {
+    "id": "1425a41a-d41c-4194-bec0-0344226d1f01",
+    "to": "tccuneri@gmail.com",
+    "subject": "Subject Test",
+    "text": "Luka Veselak (Company Test)\nlukaveselak22@gmail.com\n\nMessage Test",
+    "createdAt": "2026-06-25T13:06:24.161Z",
+    "delivery": {
+      "status": "sent",
+      "updatedAt": "2026-06-25T13:06:25.653Z"
+    }
+  },
+  {
+    "id": "0a6261e9-4b3f-4dc1-8d9b-534037b48e36",
+    "to": "tccuneri@gmail.com",
+    "subject": "Cuneri SMTP test tccuneri",
+    "text": "SMTP Test (Codex)\ntest@example.com\n\nOvo je test slanja maila sa web forme nakon promjene emaila.",
+    "createdAt": "2026-06-25T13:05:08.581Z",
+    "delivery": {
+      "status": "sent",
+      "updatedAt": "2026-06-25T13:05:10.457Z"
+    }
+  },
+  {
+    "id": "24651d9f-4ce3-47c6-a3ed-1293de02f8f4",
+    "to": "cuneri@gmail.com",
+    "subject": "Cuneri SMTP test",
+    "text": "SMTP Test (Codex)\ntest@example.com\n\nOvo je test slanja maila sa web forme.",
+    "createdAt": "2026-06-25T13:03:10.464Z",
+    "delivery": {
+      "status": "failed",
+      "error": "SMTP 535: 535-5.7.8 Username and Password not accepted. For more information, go to\r\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-49266009728sm32348885e9.2 - gsmtp",
+      "updatedAt": "2026-06-25T13:03:11.739Z"
+    }
+  },
+  {
+    "id": "d389b1ae-91cb-49be-adb9-d789a6ea2acb",
+    "to": "cuneri@gmail.com",
+    "subject": "test subject",
+    "text": "Luka Veselak (test company)\nlukaveselak22@gmail.com\n\ntest message",
+    "createdAt": "2026-06-25T13:00:23.854Z",
+    "delivery": {
+      "status": "failed",
+      "error": "SMTP 535: 535-5.7.8 Username and Password not accepted. For more information, go to\r\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials a640c23a62f3a-c120755d053sm101871466b.15 - gsmtp",
+      "updatedAt": "2026-06-25T13:00:24.526Z"
+    }
+  },
+  {
+    "id": "aae0be40-bf15-4c20-8cc6-89e4cc8618c6",
+    "to": "info@cuneri.hr",
+    "subject": "Novi javni event: ssss",
+    "text": "ddd (dd@gmail.com) dodao je event na lokaciji jdkdk. brdovec.",
+    "createdAt": "2026-06-24T16:39:34.615Z"
+  },
+  {
+    "id": "c8115d4a-b69b-424a-bd54-0167b2bcdbb4",
+    "to": "lukaveselak22@gmail.com",
+    "subject": "Tuning Crew Ćuneri pristup",
+    "text": "Email: lukaveselak22@gmail.com\nPrivremena lozinka: ulaz123ulaz\nNakon prijave moraš odmah promijeniti lozinku.",
+    "createdAt": "2026-06-17T21:34:14.741Z"
+  }
+]

@@ -1,0 +1,38 @@
+{
+  "e169fd7f-7dc3-412c-a3ec-f00904746229": {
+    "userId": "u-admin",
+    "createdAt": 1782395255306
+  },
+  "b8d40e92-a8cd-42de-ad8f-cece4094159e": {
+    "userId": "u-admin",
+    "createdAt": 1782395281204
+  },
+  "0b9d98e8-4371-4188-bae9-ad6351f6fbbc": {
+    "userId": "u-admin",
+    "createdAt": 1782457128317
+  },
+  "06f6eef4-3b8b-4590-865f-96b045560082": {
+    "userId": "u-shop-1",
+    "createdAt": 1782457128398
+  },
+  "69f0b798-64f7-4337-98c2-a0af95e667b4": {
+    "userId": "u-admin",
+    "createdAt": 1782457173954
+  },
+  "9a8d924d-f005-4c6d-bbb4-fe5debd1fe96": {
+    "userId": "u-admin",
+    "createdAt": 1782457674299
+  },
+  "d64bc479-a00a-4211-9319-3c2da5c21377": {
+    "userId": "u-shop-1",
+    "createdAt": 1782457674370
+  },
+  "02fb9560-2bcb-412b-9d2b-f7b9683bc4a4": {
+    "userId": "u-admin",
+    "createdAt": 1782460140949
+  },
+  "0dfa1b17-5070-40df-91d7-83b42c22652c": {
+    "userId": "u-admin",
+    "createdAt": 1782470313389
+  }
+}

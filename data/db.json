@@ -1,0 +1,806 @@
+{
+  "users": [
+    {
+      "id": "u-admin",
+      "username": "admin",
+      "email": "admin@cuneri.hr",
+      "name": "Ćuneri Admin",
+      "role": "admin",
+      "passwordHash": "46bb0226a4a847f6b045ffb3cd774ca2:7ab32679c03c041e24675b23ff5f5cb9f0d23867090405001a2e0816a44ffb3926fa18b6d9f16a852d04f14271f8c26347ef7b7015d9cac5cddc9f7930afdb32",
+      "mustChangePassword": false,
+      "createdAt": "2026-06-17T17:33:20.904Z",
+      "shopAccess": true,
+      "garageAccess": true
+    },
+    {
+      "id": "u-shop-1",
+      "username": "shop1",
+      "email": "shop1@cuneri.hr",
+      "name": "Webshop moderator 1",
+      "role": "shop_manager",
+      "passwordHash": "9a197ed08d177fcbbd7de6526b2ba7fe:0e76383d20b066cd4688914b29e5cca4703b4f38894cac2f86f667a9205e9880581fdaf56f1879ae7ac88d5702e4cc0e03f68da8f641806a83d64f24d38e8fdb",
+      "mustChangePassword": false,
+      "createdAt": "2026-06-17T21:34:14.498Z",
+      "shopAccess": true,
+      "garageAccess": false
+    },
+    {
+      "id": "u-shop-2",
+      "username": "shop2",
+      "email": "shop2@cuneri.hr",
+      "name": "Webshop moderator 2",
+      "role": "shop_manager",
+      "passwordHash": "9159bca8cb1d9d502a5df8794f6a0428:ed8f884b8c274cb9db5618443496cf56282d948049d047cb1e8974d4030ce7949164094b991b6620ab2dc094cfbac347d0b2c9b5f09e7d3cd073b40de4feb0f3",
+      "mustChangePassword": false,
+      "createdAt": "2026-06-17T21:34:14.631Z",
+      "shopAccess": true,
+      "garageAccess": false
+    },
+    {
+      "id": "u-a008419ea2",
+      "email": "lukaveselak22@gmail.com",
+      "name": "lukaveselak22@gmail.com",
+      "role": "member",
+      "passwordHash": "843d7c54c3659faf3f31ed17641f9643:b930899cd9d67301d4488f7fab96a331e7415c494adf98595d2d1f8b0be9c677f9bdee0c3e0a081087de0dde91348c7e9a86580fc8d29a93da94354cdf5ffc7a",
+      "mustChangePassword": true,
+      "createdAt": "2026-06-17T21:34:14.740Z",
+      "shopAccess": true,
+      "garageAccess": true,
+      "username": "lukaveselak22@gmail.com"
+    }
+  ],
+  "settings": {
+    "clubEmail": "tccuneri@gmail.com",
+    "webshopSeizedMode": true,
+    "memberCount": 52,
+    "visitedMeetsCount": 18,
+    "soonTextHr": "SOON Ćuner meet!!!",
+    "soonTextEn": "SOON Ćuner meet!!!",
+    "heroImages": [
+      "/assets/hero-night.svg",
+      "/assets/hero-sunrise.svg",
+      "/assets/hero-garage.svg"
+    ],
+    "aboutHr": "Tuning Crew Ćuneri je hrvatski autoklub za ljubitelje tuninga, stylinga, natjecanja i dobre ekipe. Okupljamo aute s karakterom i ljude koji vole raditi stvari svojim rukama.",
+    "aboutEn": "Tuning Crew Ćuneri is a Croatian car club for tuning, styling, competitions and a strong community around cars with character.",
+    "historyHr": "Tuning Crew Ćuneri nastao je iz male ekipe koja se počela okupljati oko auta, garaža i večernjih vožnji još prije nego što je ime kluba postalo službeno. U početku nije bilo velikih planova, samo nekoliko ljudi koji su nakon posla ili škole dolazili pomoći oko spuštanja auta, slaganja felgi, čišćenja interijera, popravljanja sitnica i planiranja prvih zajedničkih izlazaka.\n\nPrva godina bila je godina stvaranja identiteta. Klub je dobio ime, logo, prve fotografije, prve dogovorene susrete i prve članove koji nisu došli samo pokazati auto, nego stvarno biti dio priče. Svaki projekt imao je svoj karakter: netko je gradio clean daily, netko stance auto, netko drift projekt, a netko audio ili show car. Upravo ta razlika je postala snaga kluba, jer Ćuneri nisu zamišljeni kao ekipa u kojoj svi auti moraju izgledati isto.\n\nDruga godina donijela je ozbiljniji tempo. Više putovanja, više susreta, više fotografiranja i više ljudi koji su počeli prepoznavati ime kluba. Garažne večeri pretvorile su se u male radionice, razgovori ispred auta u planove za evente, a obični parking susreti u trenutke po kojima se pamti sezona. Klub danas broji 52 člana i svaki od njih nosi dio tog razvoja, od prvih naljepnica do novih planova za veće meetove.\n\nPovijest kluba se i dalje piše. Ćuneri žele ostati mjesto gdje se poštuje trud, gdje nije bitno imaš li najskuplji auto nego koliko si spreman učiti, slagati, pomoći i voziti s ekipom. Zato ova stranica nije samo arhiva, nego dnevnik koji će admin moći puniti slikama, tekstovima, susretima i uspomenama kako klub raste.",
+    "historyEn": "Tuning Crew Ćuneri started as a small group built around cars, garages and late drives before the club name became official. At first there were no huge plans, just people helping each other lower cars, fit wheels, clean interiors, fix details and plan the first drives together.\n\nThe first year shaped the identity. The club got its name, logo, first photos, first organized meets and first members who wanted to be part of the story, not just show a car. Each project had its own character: clean daily builds, stance cars, drift projects, audio cars and show builds.\n\nThe second year brought more momentum. More trips, more meets, more photos and more people recognizing the club name. Garage nights became small workshops, parking talks turned into event plans, and ordinary meets became memories of the season. The club now has 52 members, each carrying a part of that growth.\n\nThe story is still being written. Ćuneri wants to stay a place that respects effort, learning, helping and driving together. This page is not just an archive, but a living diary that admins can fill with photos, stories, meets and memories as the club grows.",
+    "historyImages": [
+      "/assets/hero-night.svg",
+      "/assets/hero-sunrise.svg",
+      "/assets/hero-garage.svg"
+    ]
+  },
+  "members": [
+    {
+      "id": "m-1d5af3d026",
+      "userId": "u-shop-1",
+      "email": "shop1@cuneri.hr",
+      "cars": [],
+      "name": "Webshop moderator 1",
+      "instagram": "",
+      "tiktok": "",
+      "bio": "",
+      "competitions": ""
+    },
+    {
+      "id": "m-luka",
+      "userId": null,
+      "name": "Luka Horvat",
+      "email": "luka@example.com",
+      "instagram": "@luka_cuneri",
+      "tiktok": "@luka.garage",
+      "bio": "Voli clean buildove, dobar fitment i vikend susrete.",
+      "competitions": "Style, stance, audio",
+      "cars": [
+        {
+          "id": "c-golf",
+          "name": "Golf GTI Mk7",
+          "cover": "/assets/member-golf.svg",
+          "images": [
+            "/assets/member-golf.svg",
+            "/assets/hero-garage.svg"
+          ],
+          "mods": "Stage 2 mapa, downpipe, coilover ovjes, forged felge, custom interijer.",
+          "details": "Auto je složen za daily vožnju i show nastupe, s naglaskom na čist izgled i pouzdanost.",
+          "competesIn": "Style, street class"
+        }
+      ]
+    },
+    {
+      "id": "m-marta",
+      "userId": null,
+      "name": "Marta Kovač",
+      "email": "marta@example.com",
+      "instagram": "@marta.racing",
+      "tiktok": "@marta_tune",
+      "bio": "Drift, fotografija i noćna okupljanja.",
+      "competitions": "Drift, track day",
+      "cars": [
+        {
+          "id": "c-silvia",
+          "name": "Turbo Coupe",
+          "cover": "/assets/member-coupe.svg",
+          "images": [
+            "/assets/member-coupe.svg",
+            "/assets/hero-night.svg"
+          ],
+          "mods": "Turbo kit, roll cage, hydro ručna, bucket sjedala, angle kit.",
+          "details": "Projekt za vikend treninge i evente, stalno se nadograđuje.",
+          "competesIn": "Drift"
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "id": "e-zapresic-1",
+      "title": "Wash & Meet Zapresic",
+      "city": "Zaprešić",
+      "date": "2026-07-03",
+      "time": "20:00",
+      "image": "/assets/member-golf.svg",
+      "location": "Autopraonica Zapresic",
+      "description": "Vecernje druzenje i zajednicko pranje automobila.",
+      "attendees": [],
+      "x": 51,
+      "y": 36
+    },
+    {
+      "id": "e-zagreb-1",
+      "title": "Nocni Meet Zagreb",
+      "city": "Zagreb",
+      "date": "2026-07-04",
+      "time": "21:00",
+      "image": "/assets/hero-night.svg",
+      "location": "Zagrebacki Velesajam, Zagreb",
+      "description": "Otvoreni nocni susret ljubitelja automobila.",
+      "attendees": [],
+      "x": 56,
+      "y": 40
+    },
+    {
+      "id": "e-zagreb-2",
+      "title": "Cuneri Cars & Coffee",
+      "city": "Zagreb",
+      "date": "2026-07-12",
+      "time": "10:00",
+      "image": "/assets/hero-sunrise.svg",
+      "location": "Bundek, Zagreb",
+      "description": "Jutarnja kava, fotografiranje i opusteno druzenje.",
+      "attendees": [],
+      "x": 56,
+      "y": 40
+    },
+    {
+      "id": "e-zagreb-3",
+      "title": "Zagreb Summer Cruise",
+      "city": "Zagreb",
+      "date": "2026-08-01",
+      "time": "19:30",
+      "image": "/assets/meet-lineup.svg",
+      "location": "Avenue Mall, Zagreb",
+      "description": "Okupljanje prije zajednicke ljetne voznje.",
+      "attendees": [],
+      "x": 56,
+      "y": 40
+    },
+    {
+      "id": "e-vukovar-1",
+      "title": "Dunav Street Meet",
+      "city": "Vukovar",
+      "date": "2026-07-25",
+      "time": "18:00",
+      "image": "/assets/member-coupe.svg",
+      "location": "Luka Vukovar, Vukovar",
+      "description": "Susret uz Dunav i vecernje fotografiranje.",
+      "attendees": [],
+      "x": 68,
+      "y": 43
+    },
+    {
+      "id": "e-split-1",
+      "title": "Coast Cruise Split",
+      "city": "Split",
+      "date": "2026-07-18",
+      "time": "18:30",
+      "image": "/assets/hero-sunrise.svg",
+      "location": "Znjanski plato, Split",
+      "description": "Lagani cruise, fotografiranje i druzenje uz obalu.",
+      "attendees": [],
+      "x": 48,
+      "y": 72
+    },
+    {
+      "id": "e-karlovac-1",
+      "title": "Four Rivers Meet",
+      "city": "Karlovac",
+      "date": "2026-07-05",
+      "time": "17:00",
+      "image": "/assets/member-roadster.svg",
+      "location": "Korana, Karlovac",
+      "description": "Popodnevni susret uz Koranu.",
+      "attendees": [
+        {
+          "id": "a-2694977ae8",
+          "name": "luak",
+          "lastName": "veselak",
+          "instagram": "efksfnsdfn",
+          "car": "ndsfpndsf",
+          "createdAt": "2026-06-25T13:46:41.202Z"
+        }
+      ],
+      "x": 45,
+      "y": 47
+    },
+    {
+      "id": "e-karlovac-2",
+      "title": "Karlovac Night Run",
+      "city": "Karlovac",
+      "date": "2026-07-11",
+      "time": "21:00",
+      "image": "/assets/hero-night.svg",
+      "location": "Sportska dvorana, Karlovac",
+      "description": "Nocno okupljanje i zajednicka voznja.",
+      "attendees": [],
+      "x": 45,
+      "y": 47
+    },
+    {
+      "id": "e-karlovac-3",
+      "title": "Garage Sunday Karlovac",
+      "city": "Karlovac",
+      "date": "2026-07-19",
+      "time": "11:00",
+      "image": "/assets/hero-garage.svg",
+      "location": "Banija, Karlovac",
+      "description": "Nedjeljno druzenje i razgovor o projektima.",
+      "attendees": [],
+      "x": 45,
+      "y": 47
+    },
+    {
+      "id": "e-karlovac-4",
+      "title": "Oldtimer & Tuning Day",
+      "city": "Karlovac",
+      "date": "2026-08-09",
+      "time": "16:00",
+      "image": "/assets/meet-lineup.svg",
+      "location": "Sajmiste, Karlovac",
+      "description": "Zajednicki dan oldtimera i tuning scene.",
+      "attendees": [],
+      "x": 45,
+      "y": 47
+    },
+    {
+      "id": "e-6cb3034128",
+      "title": "ssss",
+      "city": "Brdovec",
+      "location": "jdkdk. brdovec",
+      "date": "2030-01-01",
+      "time": "11:11",
+      "description": "dd",
+      "image": "/assets/meet-lineup.svg",
+      "organizerName": "ddd",
+      "organizerEmail": "dd@gmail.com",
+      "submittedByUserId": "u-admin",
+      "submittedPublicly": true,
+      "createdAt": "2026-06-24T16:39:34.612Z",
+      "attendees": [],
+      "x": 50,
+      "y": 50
+    }
+  ],
+  "posts": [
+    {
+      "id": "p-1",
+      "titleHr": "Otvorene prijave za nove članove",
+      "titleEn": "New member applications are open",
+      "textHr": "Ako imaš projekt, volju i poštovanje prema ekipi, pošalji prijavu i predstavi svoj auto.",
+      "textEn": "If you have a project, motivation and respect for the crew, send an application and present your car.",
+      "createdAt": "2026-06-17T17:33:20.904Z"
+    },
+    {
+      "id": "p-2",
+      "titleHr": "Pripreme za ljetne susrete",
+      "titleEn": "Summer meet preparation",
+      "textHr": "Uskoro objavljujemo nove lokacije i termine susreta kroz mapu.",
+      "textEn": "New event locations and dates will be published through the map soon.",
+      "createdAt": "2026-06-17T17:33:20.904Z"
+    }
+  ],
+  "sponsors": [
+    {
+      "id": "s-1",
+      "name": "Garage 2024",
+      "url": "#",
+      "logoText": "GARAGE 2024"
+    },
+    {
+      "id": "s-2",
+      "name": "Detail Lab",
+      "url": "#",
+      "logoText": "DETAIL LAB"
+    },
+    {
+      "id": "s-3",
+      "name": "Street Parts",
+      "url": "#",
+      "logoText": "STREET PARTS"
+    },
+    {
+      "id": "s-4",
+      "name": "Turbo Print",
+      "url": "#",
+      "logoText": "TURBO PRINT"
+    }
+  ],
+  "weather": [
+    {
+      "city": "Zagreb",
+      "days": [
+        {
+          "date": "2026-06-17",
+          "temp": 18,
+          "icon": "sun",
+          "textHr": "Sunčano",
+          "textEn": "Sunny"
+        },
+        {
+          "date": "2026-06-18",
+          "temp": 19,
+          "icon": "cloud",
+          "textHr": "Oblačno",
+          "textEn": "Cloudy"
+        },
+        {
+          "date": "2026-06-19",
+          "temp": 20,
+          "icon": "storm",
+          "textHr": "Moguća kiša",
+          "textEn": "Chance of rain"
+        },
+        {
+          "date": "2026-06-20",
+          "temp": 21,
+          "icon": "wind",
+          "textHr": "Vjetrovito",
+          "textEn": "Windy"
+        },
+        {
+          "date": "2026-06-21",
+          "temp": 22,
+          "icon": "clear",
+          "textHr": "Vedro",
+          "textEn": "Clear"
+        }
+      ]
+    },
+    {
+      "city": "Split",
+      "days": [
+        {
+          "date": "2026-06-17",
+          "temp": 19,
+          "icon": "cloud",
+          "textHr": "Oblačno",
+          "textEn": "Cloudy"
+        },
+        {
+          "date": "2026-06-18",
+          "temp": 20,
+          "icon": "storm",
+          "textHr": "Moguća kiša",
+          "textEn": "Chance of rain"
+        },
+        {
+          "date": "2026-06-19",
+          "temp": 21,
+          "icon": "wind",
+          "textHr": "Vjetrovito",
+          "textEn": "Windy"
+        },
+        {
+          "date": "2026-06-20",
+          "temp": 22,
+          "icon": "clear",
+          "textHr": "Vedro",
+          "textEn": "Clear"
+        },
+        {
+          "date": "2026-06-21",
+          "temp": 23,
+          "icon": "sun",
+          "textHr": "Sunčano",
+          "textEn": "Sunny"
+        }
+      ]
+    },
+    {
+      "city": "Rijeka",
+      "days": [
+        {
+          "date": "2026-06-17",
+          "temp": 20,
+          "icon": "storm",
+          "textHr": "Moguća kiša",
+          "textEn": "Chance of rain"
+        },
+        {
+          "date": "2026-06-18",
+          "temp": 21,
+          "icon": "wind",
+          "textHr": "Vjetrovito",
+          "textEn": "Windy"
+        },
+        {
+          "date": "2026-06-19",
+          "temp": 22,
+          "icon": "clear",
+          "textHr": "Vedro",
+          "textEn": "Clear"
+        },
+        {
+          "date": "2026-06-20",
+          "temp": 23,
+          "icon": "sun",
+          "textHr": "Sunčano",
+          "textEn": "Sunny"
+        },
+        {
+          "date": "2026-06-21",
+          "temp": 24,
+          "icon": "cloud",
+          "textHr": "Oblačno",
+          "textEn": "Cloudy"
+        }
+      ]
+    },
+    {
+      "city": "Osijek",
+      "days": [
+        {
+          "date": "2026-06-17",
+          "temp": 21,
+          "icon": "wind",
+          "textHr": "Vjetrovito",
+          "textEn": "Windy"
+        },
+        {
+          "date": "2026-06-18",
+          "temp": 22,
+          "icon": "clear",
+          "textHr": "Vedro",
+          "textEn": "Clear"
+        },
+        {
+          "date": "2026-06-19",
+          "temp": 23,
+          "icon": "sun",
+          "textHr": "Sunčano",
+          "textEn": "Sunny"
+        },
+        {
+          "date": "2026-06-20",
+          "temp": 24,
+          "icon": "cloud",
+          "textHr": "Oblačno",
+          "textEn": "Cloudy"
+        },
+        {
+          "date": "2026-06-21",
+          "temp": 25,
+          "icon": "storm",
+          "textHr": "Moguća kiša",
+          "textEn": "Chance of rain"
+        }
+      ]
+    },
+    {
+      "city": "Dubrovnik",
+      "days": [
+        {
+          "date": "2026-06-17",
+          "temp": 22,
+          "icon": "clear",
+          "textHr": "Vedro",
+          "textEn": "Clear"
+        },
+        {
+          "date": "2026-06-18",
+          "temp": 23,
+          "icon": "sun",
+          "textHr": "Sunčano",
+          "textEn": "Sunny"
+        },
+        {
+          "date": "2026-06-19",
+          "temp": 24,
+          "icon": "cloud",
+          "textHr": "Oblačno",
+          "textEn": "Cloudy"
+        },
+        {
+          "date": "2026-06-20",
+          "temp": 25,
+          "icon": "storm",
+          "textHr": "Moguća kiša",
+          "textEn": "Chance of rain"
+        },
+        {
+          "date": "2026-06-21",
+          "temp": 26,
+          "icon": "wind",
+          "textHr": "Vjetrovito",
+          "textEn": "Windy"
+        }
+      ]
+    }
+  ],
+  "contacts": [
+    {
+      "id": "contact-506c8ad1da",
+      "name": "luka",
+      "lastName": "Veselak",
+      "email": "lukaveselak22@gmail.com",
+      "company": "Nemam",
+      "subject": "test",
+      "message": "luka voli gabi",
+      "createdAt": "2026-06-28T09:36:53.456Z"
+    },
+    {
+      "id": "contact-6ce6c6b6b3",
+      "name": "Petra Veselak",
+      "lastName": "Veselak",
+      "email": "lukaveselak22@gmail.com",
+      "company": "test company",
+      "subject": "lukaveselak22@gmail.com",
+      "message": "ddwdwddwdwdwdwwdwdwdwdwdwdwdwddwwdw",
+      "createdAt": "2026-06-26T06:45:49.416Z"
+    },
+    {
+      "id": "contact-c6e0b57bf7",
+      "subject": "Testing auta reply fixed",
+      "name": "Luka",
+      "company": "Rimac",
+      "lastName": "Veselak",
+      "email": "lukaveselak22@gmail.com",
+      "message": "luka\nvoli\n\nmacke\n\ni\naute",
+      "createdAt": "2026-06-25T13:12:05.445Z"
+    },
+    {
+      "id": "contact-f01e5c8992",
+      "name": "Luka",
+      "lastName": "Veselak",
+      "email": "lukaveselak22@gmail.com",
+      "company": "Rimac",
+      "subject": "Testing auta",
+      "message": "luka\nvoli\n\nmacke\n\n\ni\naute",
+      "createdAt": "2026-06-25T13:10:49.182Z"
+    },
+    {
+      "id": "contact-9f1fea8d8d",
+      "subject": "Subject Test ljepse",
+      "name": "Luka",
+      "company": "XXXX",
+      "lastName": "Veselak",
+      "email": "lukaveselak22@gmail.com",
+      "message": "Message Test`nDrugi red poruke.",
+      "createdAt": "2026-06-25T13:10:00.127Z"
+    },
+    {
+      "id": "contact-9c5bc71244",
+      "name": "Luka",
+      "lastName": "Veselak",
+      "email": "lukaveselak22@gmail.com",
+      "company": "Company Test",
+      "subject": "Subject Test",
+      "message": "Message Test",
+      "createdAt": "2026-06-25T13:06:24.160Z"
+    },
+    {
+      "id": "contact-b10de3bcac",
+      "subject": "Cuneri SMTP test tccuneri",
+      "name": "SMTP",
+      "company": "Codex",
+      "lastName": "Test",
+      "email": "test@example.com",
+      "message": "Ovo je test slanja maila sa web forme nakon promjene emaila.",
+      "createdAt": "2026-06-25T13:05:08.579Z"
+    },
+    {
+      "id": "contact-010c32eef2",
+      "subject": "Cuneri SMTP test",
+      "name": "SMTP",
+      "company": "Codex",
+      "lastName": "Test",
+      "email": "test@example.com",
+      "message": "Ovo je test slanja maila sa web forme.",
+      "createdAt": "2026-06-25T13:03:10.462Z"
+    },
+    {
+      "id": "contact-29985eb638",
+      "name": "Luka",
+      "lastName": "Veselak",
+      "email": "lukaveselak22@gmail.com",
+      "company": "test company",
+      "subject": "test subject",
+      "message": "test message",
+      "createdAt": "2026-06-25T13:00:23.852Z"
+    }
+  ],
+  "joinRequests": [],
+  "products": [
+    {
+      "id": "prod-d36682c8d5",
+      "name": "dfsdf",
+      "category": "sdff",
+      "description": "sdfsf",
+      "price": 100,
+      "salePercent": 20,
+      "stock": 1,
+      "image": "/uploads/1782395146149-e4b1ecfc-ChatGPT-Image-Jun-24--2026--11_24_39-AM.png",
+      "audiences": [
+        "musko"
+      ],
+      "colors": [
+        "crno"
+      ],
+      "sizes": [
+        "xl"
+      ],
+      "active": true
+    },
+    {
+      "id": "prod-hoodie",
+      "name": "Cuneri hoodie",
+      "category": "Hoodies",
+      "description": "Heavy cotton hoodie with club print.",
+      "price": 49.9,
+      "image": "/assets/member-wagon.svg",
+      "audiences": [
+        "Musko",
+        "Zensko"
+      ],
+      "colors": [
+        "Crna",
+        "Bijela",
+        "Crvena"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL",
+        "XXL"
+      ],
+      "stock": 40,
+      "active": true,
+      "salePercent": 15
+    },
+    {
+      "id": "prod-shirt",
+      "name": "Cuneri T-shirt",
+      "category": "Majice",
+      "description": "Short sleeve club T-shirt.",
+      "price": 24.9,
+      "image": "/assets/member-roadster.svg",
+      "audiences": [
+        "Musko",
+        "Zensko"
+      ],
+      "colors": [
+        "Crna",
+        "Bijela",
+        "Crvena"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL",
+        "XXL"
+      ],
+      "stock": 65,
+      "active": true
+    },
+    {
+      "id": "prod-cap",
+      "name": "Cuneri silterica",
+      "category": "Kape",
+      "description": "Unisex adjustable cap.",
+      "price": 19.9,
+      "image": "/assets/meet-lineup.svg",
+      "audiences": [],
+      "colors": [
+        "Crna",
+        "Bijela",
+        "Crvena"
+      ],
+      "sizes": [],
+      "stock": 31,
+      "active": true
+    },
+    {
+      "id": "prod-sticker",
+      "name": "Cuneri naljepnica",
+      "category": "Dodaci",
+      "description": "Weather-resistant club sticker.",
+      "price": 3.5,
+      "image": "/assets/cuneri-logo.png",
+      "audiences": [],
+      "colors": [],
+      "sizes": [],
+      "stock": 150,
+      "active": true
+    }
+  ],
+  "orders": [
+    {
+      "id": "order-1855f4d690",
+      "userId": "u-a008419ea2",
+      "customerEmail": "lukaveselak22@gmail.com",
+      "profile": {
+        "firstName": "Petra",
+        "lastName": "Veselak",
+        "phone": "0992122457",
+        "deliveryType": "address",
+        "address": "Bregovita 44",
+        "city": "Brdovec",
+        "postalCode": "10291",
+        "deliveryNote": "v",
+        "parcelService": "",
+        "parcelLocker": "",
+        "parcelAddress": "",
+        "billingCity": "Brdovec",
+        "billingStreet": "Bregovita",
+        "billingHouseNumber": "44",
+        "billingNote": "v",
+        "billingPostalCode": "10291",
+        "paymentMethod": "cod"
+      },
+      "items": [
+        {
+          "productId": "prod-cap",
+          "name": "Cuneri silterica",
+          "price": 19.9,
+          "quantity": 1,
+          "audience": "",
+          "color": "Crna",
+          "size": ""
+        }
+      ],
+      "subtotal": 19.9,
+      "couponCode": "2CV10",
+      "discount": 1.99,
+      "total": 17.91,
+      "paymentMethod": "cod",
+      "paymentStatus": "Pouzecem",
+      "status": "Nova",
+      "trackingCarrier": "",
+      "trackingCode": "",
+      "createdAt": "2026-06-25T13:40:59.915Z",
+      "statusEmailsSent": {}
+    }
+  ],
+  "coupons": [
+    {
+      "id": "coupon-2cv10",
+      "code": "2CV10",
+      "percent": 10,
+      "maxUses": 100000,
+      "usedCount": 1,
+      "onePerCustomer": true,
+      "firstOrderOnly": true,
+      "active": true
+    }
+  ],
+  "couponRedemptions": [
+    {
+      "couponId": "coupon-2cv10",
+      "customerKey": "u-a008419ea2",
+      "orderId": "order-1855f4d690",
+      "createdAt": "2026-06-25T13:40:59.915Z"
+    }
+  ]
+}

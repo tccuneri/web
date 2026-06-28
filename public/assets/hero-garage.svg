@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 950" role="img" aria-label="Tuning garage">
+  <defs>
+    <linearGradient id="bg" y1="0" y2="1"><stop stop-color="#050607"/><stop offset=".5" stop-color="#101417"/><stop offset="1" stop-color="#030405"/></linearGradient>
+    <linearGradient id="floor" y1="0" y2="1"><stop stop-color="#24282b"/><stop offset="1" stop-color="#070809"/></linearGradient>
+    <linearGradient id="whitecar" x1="0" x2="1"><stop stop-color="#121416"/><stop offset=".38" stop-color="#e4e5e6"/><stop offset=".7" stop-color="#f8f8f8"/><stop offset="1" stop-color="#17191c"/></linearGradient>
+  </defs>
+  <rect width="1800" height="950" fill="url(#bg)"/>
+  <path d="M0 555 L1800 490 L1800 950 L0 950Z" fill="url(#floor)"/>
+  <g opacity=".55">
+    <rect x="120" y="120" width="1560" height="12" fill="#00d7ff"/>
+    <rect x="220" y="205" width="420" height="5" fill="#fff"/>
+    <rect x="1140" y="210" width="380" height="5" fill="#fff"/>
+    <path d="M260 120 L90 520" stroke="#2b3338" stroke-width="6"/><path d="M1540 120 L1710 520" stroke="#2b3338" stroke-width="6"/>
+  </g>
+  <g transform="translate(300 480)">
+    <path d="M160 180 L290 72 C365 10 570 0 765 24 C872 38 960 70 1035 140 L1190 185 C1255 205 1294 246 1310 306 L1260 350 L118 350 L48 302 C50 250 80 205 160 180Z" fill="url(#whitecar)"/>
+    <path d="M350 62 C470 30 662 33 800 51 C870 61 922 90 970 132 L305 142 C313 105 328 78 350 62Z" fill="#0d161a"/>
+    <path d="M180 186 C290 163 360 162 455 174" stroke="#00d7ff" stroke-width="5" fill="none"/>
+    <path d="M630 188 C785 170 940 174 1090 198" stroke="#111" stroke-width="6" fill="none"/>
+    <circle cx="345" cy="350" r="94" fill="#030405"/><circle cx="345" cy="350" r="58" fill="#161b1f" stroke="#f2f7fa" stroke-width="8"/>
+    <circle cx="1048" cy="350" r="94" fill="#030405"/><circle cx="1048" cy="350" r="58" fill="#161b1f" stroke="#f2f7fa" stroke-width="8"/>
+    <path d="M58 286 L305 282 L382 321 L92 328Z" fill="#00d7ff" opacity=".9"/>
+    <path d="M945 282 L1306 300 L1258 330 L875 318Z" fill="#ff284c" opacity=".75"/>
+  </g>
+  <g opacity=".28" stroke="#fff">
+    <path d="M152 680 L520 634 L920 654 L1350 610 L1700 635"/>
+    <path d="M95 780 L530 730 L930 750 L1420 705 L1770 735"/>
+  </g>
+</svg>
