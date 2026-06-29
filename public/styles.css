@@ -454,17 +454,20 @@ input:focus, textarea:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px r
 .access-login-grid{max-width:1040px;grid-template-columns:minmax(340px,.9fr) minmax(440px,1.1fr);gap:22px}
 .access-login .login-box,.access-login .form-box{border-color:rgba(255,255,255,.16);background:linear-gradient(145deg,rgba(18,29,33,.94),rgba(8,11,13,.96));box-shadow:0 24px 80px rgba(0,0,0,.32)}
 .access-login .login-box{width:100%;padding:30px;position:sticky;top:100px}
+.access-login.admin-login-only,.access-login.reset-login-only{place-items:center}
+.access-login.admin-login-only .access-login-grid{display:block;width:min(460px,100%)}
+.access-login.admin-login-only .login-box,.access-login.reset-login-only .login-box{position:static;width:min(460px,100%)}
 .access-login .login-box h1{font-size:clamp(38px,5vw,58px);margin:10px 0 18px;text-transform:uppercase}
 .access-login .login-box p{color:#cbd4d7;line-height:1.6}
 .access-login .admin-form{margin-top:24px}.access-login .admin-form .btn{margin-top:5px;width:100%}
-.login-links{display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:space-between}
+.login-links{display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:flex-start}
 .login-side{display:grid;grid-template-columns:1fr;gap:16px;align-content:start}
 .login-side .form-box{align-content:start;padding:25px}
 .login-side .form-box h3{margin:0 0 12px;font-size:22px;text-transform:uppercase}
 .login-side form[data-form="shop-reset"]{grid-template-columns:1fr auto;align-items:end}
 .login-side form[data-form="shop-reset"] h3{grid-column:1/-1}.login-side form[data-form="shop-reset"] .btn{min-width:190px}
 .login-side form[data-form="shop-register"]{grid-template-columns:1fr 1fr}
-.login-side form[data-form="shop-register"] h3,.login-side form[data-form="shop-register"] button{grid-column:1/-1}
+.login-side form[data-form="shop-register"] h3,.login-side form[data-form="shop-register"] .admin-help,.login-side form[data-form="shop-register"] button{grid-column:1/-1}
 .login-side form[data-form="shop-register"] label:nth-of-type(3){grid-column:1/-1}
 .login-side input{background:rgba(0,0,0,.3)}
 
