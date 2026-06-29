@@ -656,6 +656,7 @@ function accessUserRow(user) {
     <label class="check-label"><input type="checkbox" name="shopAccess" ${user.shopAccess ? "checked" : ""} /> Webshop</label>
     <label class="check-label"><input type="checkbox" name="garageAccess" ${user.garageAccess ? "checked" : ""} /> Clan autokluba</label>
     <label class="check-label"><input type="checkbox" name="meetAccess" ${user.meetAccess || user.role === "meet_manager" ? "checked" : ""} /> Meet</label>
+    <span class="admin-help">${user.emailVerified ? "Email verificiran" : "Email nije verificiran"}</span>
     <button class="btn secondary" type="button" data-edit-user="${user.id}">Uredi sve</button>
     <button class="btn secondary">Spremi</button>
     ${canDelete ? `<button class="btn danger" type="button" data-delete-user="${user.id}" data-delete-user-email="${escapeHtml(identifier)}">Obrisi</button>` : `<span class="admin-help">Trenutni admin</span>`}
@@ -739,6 +740,7 @@ function openAdminUserEditor(userId) {
         <label class="check-label"><input type="checkbox" name="shopAccess" ${user.shopAccess ? "checked" : ""} /> Webshop pristup</label>
         <label class="check-label"><input type="checkbox" name="garageAccess" ${user.garageAccess ? "checked" : ""} /> Clan autokluba</label>
         <label class="check-label"><input type="checkbox" name="meetAccess" ${user.meetAccess || user.role === "meet_manager" ? "checked" : ""} /> Meet panel pristup</label>
+        <label class="check-label"><input type="checkbox" name="emailVerified" ${user.emailVerified ? "checked" : ""} /> Email verificiran</label>
         <label class="check-label"><input type="checkbox" name="mustChangePassword" ${user.mustChangePassword ? "checked" : ""} /> Mora promijeniti lozinku</label>
         <label>Ime<input name="firstName" value="${escapeHtml(profile.firstName || "")}" /></label>
         <label>Prezime<input name="lastName" value="${escapeHtml(profile.lastName || "")}" /></label>
@@ -803,6 +805,7 @@ function collectAdminUserEdit(form) {
     shopAccess: Boolean(data.shopAccess),
     garageAccess: Boolean(data.garageAccess),
     meetAccess: Boolean(data.meetAccess),
+    emailVerified: Boolean(data.emailVerified),
     mustChangePassword: Boolean(data.mustChangePassword),
     firstName: data.firstName,
     lastName: data.lastName,
@@ -1571,12 +1574,28 @@ function accessLoginPage(mode) {
   const isAdmin = mode === "admin";
   const links = isAdmin
     ? `<a class="text-link" href="/webshop-login" data-link>Login za clanove i webshop</a>`
-    : `<a class="text-link" href="/admin" data-link>ADMIN</a><a class="text-link" href="/zaboravljena-lozinka" data-link>Zaboravljena lozinka</a>`;
+    : `<a class="text-link" href="/zaboravljena-lozinka" data-link>Zaboravljena lozinka</a><a class="text-link" href="/admin" data-link>ADMIN</a>`;
   app.innerHTML = `<section class="login-shell access-login ${isAdmin ? "admin-login-only" : ""}"><div class="access-login-grid"><div class="login-box"><span class="kicker">${isAdmin ? "CUNERI ADMIN" : "CLANOVI I WEBSHOP"}</span><h1>${isAdmin ? "Admin login" : "Login"}</h1><p>${isAdmin ? "Admin tim se prijavljuje ovdje." : "Isti email i lozinka koriste se za webshop i clanove autokluba. Sustav sam prepoznaje imas li samo webshop ili i garazu/clanski pristup koji odobrava admin."}</p><form class="admin-form" data-form="login"><input type="hidden" name="loginMode" value="${isAdmin ? "admin" : "shop"}" /><label>Email / username<input required name="username" /></label><label>Lozinka<input required type="password" name="password" /></label><button class="btn">Prijava</button></form><div class="login-links">${links}</div></div>${isAdmin ? "" : `<div class="login-side"><form class="form-box" data-form="shop-register"><h3>Registracija za webshop</h3><p class="admin-help">Ovo otvara samo webshop racun. Clan autokluba postajes kad admin odobri garazu/clanski pristup.</p><label>Ime<input required name="firstName" /></label><label>Prezime<input required name="lastName" /></label><label>Email<input required type="email" name="email" /></label><label>Lozinka<input required minlength="8" type="password" name="password" /></label><label>Ponovi lozinku<input required minlength="8" type="password" name="passwordConfirm" /></label><button class="btn">Registracija</button></form></div>`}</div></section>`;
 }
 
 function forgotPasswordPage() {
   app.innerHTML = `<section class="login-shell access-login reset-login-only"><div class="login-box"><span class="kicker">RESET LOZINKE</span><h1>Zaboravljena lozinka</h1><p>Upisi email svog webshop ili clanskog racuna. Ako racun postoji, poslat cemo ti privremenu lozinku.</p><form class="admin-form" data-form="shop-reset"><label>Email<input required type="email" name="email" /></label><button class="btn">Posalji reset email</button></form><div class="login-links"><a class="text-link" href="/webshop-login" data-link>Natrag na login</a><a class="text-link" href="/admin" data-link>ADMIN</a></div></div></section>`;
+}
+
+function verifyEmailPage() {
+  const params = new URLSearchParams(location.search);
+  const email = params.get("email") || sessionStorage.getItem("cuneri_verify_email") || "";
+  const token = params.get("token") || "";
+  app.innerHTML = `<section class="login-shell access-login reset-login-only"><div class="login-box"><span class="kicker">EMAIL VERIFIKACIJA</span><h1>Potvrdi email</h1><p>Upisi kod iz maila ili koristi link koji si dobio/la. Bez potvrde emaila ne mozes se prijaviti.</p><form class="admin-form" data-form="verify-email"><input type="hidden" name="token" value="${escapeHtml(token)}" /><label>Email<input required type="email" name="email" value="${escapeHtml(email)}" /></label><label>Kod za verifikaciju<input name="code" maxlength="10" placeholder="npr. A1B2C3D4E5" /></label><button class="btn">Verificiraj email</button></form><div class="login-links"><a class="text-link" href="/webshop-login" data-link>Natrag na login</a><a class="text-link" href="/zaboravljena-lozinka" data-link>Zaboravljena lozinka</a></div></div></section>`;
+  if (token) {
+    api("/api/verify-email", { method: "POST", body: { token, email } })
+      .then(() => {
+        sessionStorage.removeItem("cuneri_verify_email");
+        toast("Email je verificiran. Sada se mozes prijaviti.");
+        navigate("/webshop-login");
+      })
+      .catch(error => toast(error.message));
+  }
 }
 
 async function adminPage() {
@@ -1802,10 +1821,18 @@ async function submitForm(form) {
     return;
   }
   if (type === "shop-register") {
-    await api("/api/shop/register", { method: "POST", body: data });
+    const result = await api("/api/shop/register", { method: "POST", body: data });
     form.reset();
-    toast("Racun je otvoren. Sada se prijavi.");
-    navigate("/login");
+    if (result.email) sessionStorage.setItem("cuneri_verify_email", result.email);
+    toast("Racun je otvoren. Provjeri email i verificiraj racun.");
+    navigate("/verifikacija-emaila");
+    return;
+  }
+  if (type === "verify-email") {
+    await api("/api/verify-email", { method: "POST", body: data });
+    sessionStorage.removeItem("cuneri_verify_email");
+    toast("Email je verificiran. Sada se mozes prijaviti.");
+    navigate("/webshop-login");
     return;
   }
   if (type === "shop-checkout") {
@@ -2460,12 +2487,28 @@ function accessLoginPage(mode) {
     : ui("Isti email i lozinka koriste se za webshop i clanove autokluba. Sustav sam prepoznaje imas li samo webshop ili i garazu/clanski pristup koji odobrava admin.", "The same email and password are used for the webshop and club members. The system detects whether you only have webshop access or also garage/member access approved by an admin.");
   const secondaryLinks = isAdmin
     ? `<a class="text-link" href="/webshop-login" data-link>${ui("Login za clanove i webshop", "Member and webshop login")}</a>`
-    : `<a class="text-link" href="/admin" data-link>ADMIN</a><a class="text-link" href="/zaboravljena-lozinka" data-link>${ui("Zaboravljena lozinka", "Forgot password")}</a>`;
+    : `<a class="text-link" href="/zaboravljena-lozinka" data-link>${ui("Zaboravljena lozinka", "Forgot password")}</a><a class="text-link" href="/admin" data-link>ADMIN</a>`;
   app.innerHTML = `<section class="login-shell access-login ${isAdmin ? "admin-login-only" : ""}"><div class="access-login-grid"><div class="login-box"><span class="kicker">${kicker}</span><h1>${title}</h1><p>${text}</p><form class="admin-form" data-form="login"><input type="hidden" name="loginMode" value="${isAdmin ? "admin" : "shop"}" /><label>Email / username<input required name="username" /></label><label>${tr("password")}<input required type="password" name="password" /></label><button class="btn">${tr("login")}</button></form><div class="login-links">${secondaryLinks}</div></div>${isAdmin ? "" : `<div class="login-side"><form class="form-box" data-form="shop-register"><h3>${ui("Registracija za webshop", "Webshop registration")}</h3><p class="admin-help">${ui("Ovo otvara samo webshop racun. Clan autokluba postajes kad admin odobri garazu/clanski pristup.", "This creates a webshop account only. You become a club member when an admin approves garage/member access.")}</p><label>${tr("name")}<input required name="firstName" /></label><label>${tr("lastName")}<input required name="lastName" /></label><label>${tr("email")}<input required type="email" name="email" /></label><label>${tr("password")}<input required minlength="8" type="password" name="password" /></label><label>${ui("Ponovi lozinku", "Repeat password")}<input required minlength="8" type="password" name="passwordConfirm" /></label><button class="btn">${ui("Registracija", "Register")}</button></form></div>`}</div></section>`;
 }
 
 function forgotPasswordPage() {
   app.innerHTML = `<section class="login-shell access-login reset-login-only"><div class="login-box"><span class="kicker">RESET LOZINKE</span><h1>${ui("Zaboravljena lozinka", "Forgot password")}</h1><p>${ui("Upisi email svog webshop ili clanskog racuna. Ako racun postoji, poslat cemo ti privremenu lozinku.", "Enter the email for your webshop or member account. If the account exists, we will send a temporary password.")}</p><form class="admin-form" data-form="shop-reset"><label>${tr("email")}<input required type="email" name="email" /></label><button class="btn">${ui("Posalji reset email", "Send reset email")}</button></form><div class="login-links"><a class="text-link" href="/webshop-login" data-link>${ui("Natrag na login", "Back to login")}</a><a class="text-link" href="/admin" data-link>ADMIN</a></div></div></section>`;
+}
+
+function verifyEmailPage() {
+  const params = new URLSearchParams(location.search);
+  const email = params.get("email") || sessionStorage.getItem("cuneri_verify_email") || "";
+  const token = params.get("token") || "";
+  app.innerHTML = `<section class="login-shell access-login reset-login-only"><div class="login-box"><span class="kicker">EMAIL VERIFIKACIJA</span><h1>${ui("Potvrdi email", "Verify email")}</h1><p>${ui("Upisi kod iz maila ili koristi link koji si dobio/la. Bez potvrde emaila ne mozes se prijaviti.", "Enter the code from the email or use the link you received. You cannot sign in before verifying your email.")}</p><form class="admin-form" data-form="verify-email"><input type="hidden" name="token" value="${escapeHtml(token)}" /><label>${tr("email")}<input required type="email" name="email" value="${escapeHtml(email)}" /></label><label>${ui("Kod za verifikaciju", "Verification code")}<input name="code" maxlength="10" placeholder="npr. A1B2C3D4E5" /></label><button class="btn">${ui("Verificiraj email", "Verify email")}</button></form><div class="login-links"><a class="text-link" href="/webshop-login" data-link>${ui("Natrag na login", "Back to login")}</a><a class="text-link" href="/zaboravljena-lozinka" data-link>${ui("Zaboravljena lozinka", "Forgot password")}</a></div></div></section>`;
+  if (token) {
+    api("/api/verify-email", { method: "POST", body: { token, email } })
+      .then(() => {
+        sessionStorage.removeItem("cuneri_verify_email");
+        toast(ui("Email je verificiran. Sada se mozes prijaviti.", "Email verified. You can now sign in."));
+        navigate("/webshop-login");
+      })
+      .catch(error => toast(error.message));
+  }
 }
 
 async function meetPanelPage() {
@@ -2611,6 +2654,7 @@ function render() {
   else if (path === "/profil" || path === "/profile") userProfilePage();
   else if (path === "/login" || path === "/webshop-login") accessLoginPage("shop");
   else if (path === "/zaboravljena-lozinka" || path === "/forgot-password") forgotPasswordPage();
+  else if (path === "/verifikacija-emaila" || path === "/verify-email") verifyEmailPage();
   else if (path === "/login-clanovi") accessLoginPage("shop");
   else if (path === "/terms" || path === "/therms") termsPageCurrent();
   else if (path === "/admin") adminPage().catch(error => toast(error.message));

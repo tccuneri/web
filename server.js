@@ -244,6 +244,7 @@ function normalizeDb(db) {
     user.shopAccess ??= ["admin", "shop_manager", "member", "customer"].includes(user.role);
     user.garageAccess ??= ["admin", "member"].includes(user.role);
     user.meetAccess ??= ["admin", "meet_manager"].includes(user.role);
+    user.emailVerified ??= !user.email || user.role === "admin" || !user.emailVerificationCode;
   }
   db.products ||= defaultProducts();
   db.orders ||= [];
@@ -424,8 +425,49 @@ function requireUser(req, res, db) {
 
 function publicUser(user) {
   if (!user) return null;
-  const { passwordHash, ...safe } = user;
+  const { passwordHash, emailVerificationCode, emailVerificationToken, emailVerificationExpiresAt, ...safe } = user;
   return safe;
+}
+
+function verificationCode() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  return Array.from({ length: 10 }, () => alphabet[crypto.randomInt(0, alphabet.length)]).join("");
+}
+
+function baseUrl(req) {
+  const proto = req.headers["x-forwarded-proto"] || (req.socket?.encrypted ? "https" : "http");
+  const host = req.headers["x-forwarded-host"] || req.headers.host || "localhost:3000";
+  return `${proto}://${host}`;
+}
+
+function prepareEmailVerification(user) {
+  user.emailVerified = false;
+  user.emailVerificationCode = verificationCode();
+  user.emailVerificationToken = crypto.randomBytes(24).toString("hex");
+  user.emailVerificationExpiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+  return user;
+}
+
+function verificationLink(req, user) {
+  const params = new URLSearchParams({ token: user.emailVerificationToken || "", email: user.email || "" });
+  return `${baseUrl(req)}/verifikacija-emaila?${params.toString()}`;
+}
+
+function verificationMail(req, user, intro = "Dobrodosao/la u Tuning Crew Cuneri.") {
+  const code = user.emailVerificationCode || "";
+  const link = verificationLink(req, user);
+  return [
+    intro,
+    "",
+    `Username: ${user.email || user.username}`,
+    "",
+    "Za potvrdu emaila klikni link:",
+    link,
+    "",
+    `Ili na stranici za verifikaciju upisi kod: ${code}`,
+    "",
+    "Kod vrijedi 48 sati."
+  ].join("\n");
 }
 
 function smtpConfig() {
@@ -1012,12 +1054,35 @@ async function api(req, res, url) {
       if (!body.firstName || !body.lastName || !body.email || !body.password || String(body.password).length < 8) return sendJson(res, 400, { error: "Ime, prezime, email i lozinka od najmanje 8 znakova su obavezni." });
       if (body.password !== body.passwordConfirm) return sendJson(res, 400, { error: "Lozinke nisu jednake." });
       if (db.users.some(user => String(user.email).toLowerCase() === String(body.email).toLowerCase())) return sendJson(res, 409, { error: "Korisnik s tim emailom vec postoji." });
-      const user = { id: slug("u"), email: body.email, username: body.email, name: `${body.firstName} ${body.lastName}`, role: "customer", shopAccess: true, garageAccess: false, passwordHash: hashPassword(body.password), mustChangePassword: false, shopProfile: { firstName: body.firstName, lastName: body.lastName }, createdAt: new Date().toISOString() };
+      const user = prepareEmailVerification({ id: slug("u"), email: body.email, username: body.email, name: `${body.firstName} ${body.lastName}`, role: "customer", shopAccess: true, garageAccess: false, passwordHash: hashPassword(body.password), mustChangePassword: false, shopProfile: { firstName: body.firstName, lastName: body.lastName }, createdAt: new Date().toISOString() });
       db.users.push(user);
       saveDb(db);
-      appendMail(body.email, "Cuneri webshop - registracija", `Pozdrav ${body.firstName},\n\nTvoj Cuneri webshop racun je otvoren za email ${body.email}.\n\nMozes se prijaviti i pratiti svoje narudzbe.`);
+      appendMail(body.email, "Cuneri - potvrdi email", verificationMail(req, user, `Pozdrav ${body.firstName},\n\nTvoj Cuneri webshop racun je otvoren. Prije prijave moras potvrditi email.`));
       appendMail(db.settings.clubEmail || CLUB_EMAIL, "Novi webshop korisnik", `${body.firstName} ${body.lastName} otvorio/la je webshop racun.\nEmail: ${body.email}`, { replyTo: body.email });
-      return sendJson(res, 201, { ok: true });
+      return sendJson(res, 201, { ok: true, requiresVerification: true, email: user.email });
+    }
+
+    if (method === "POST" && route === "/api/verify-email") {
+      const body = await parseBody(req);
+      const email = String(body.email || "").toLowerCase();
+      const code = String(body.code || "").trim().toUpperCase();
+      const token = String(body.token || "").trim();
+      const user = db.users.find(item =>
+        (email && String(item.email || "").toLowerCase() === email) ||
+        (token && item.emailVerificationToken === token)
+      );
+      if (!user) return sendJson(res, 404, { error: "Racun za verifikaciju nije pronaden." });
+      if (user.emailVerified) return sendJson(res, 200, { ok: true, alreadyVerified: true });
+      if (user.emailVerificationExpiresAt && Date.now() > new Date(user.emailVerificationExpiresAt).getTime()) return sendJson(res, 410, { error: "Kod za verifikaciju je istekao. Javi se adminu ili pokreni novu registraciju s drugim emailom." });
+      const tokenOk = token && user.emailVerificationToken === token;
+      const codeOk = code && String(user.emailVerificationCode || "").toUpperCase() === code;
+      if (!tokenOk && !codeOk) return sendJson(res, 400, { error: "Kod ili link za verifikaciju nije ispravan." });
+      user.emailVerified = true;
+      delete user.emailVerificationCode;
+      delete user.emailVerificationToken;
+      delete user.emailVerificationExpiresAt;
+      saveDb(db);
+      return sendJson(res, 200, { ok: true });
     }
 
     if (method === "POST" && route === "/api/shop/reset-password") {
@@ -1349,6 +1414,7 @@ async function api(req, res, url) {
         (login === "admin" && u.role === "admin")
       );
       if (!user || !verifyPassword(password || "", user.passwordHash)) return sendJson(res, 401, { error: "Krivi email ili lozinka." });
+      if (!user.emailVerified && user.role !== "admin") return sendJson(res, 403, { error: "Prije prijave moras verificirati email. Provjeri mail i klikni link ili upisi kod za verifikaciju." });
       if (loginMode === "admin" && !["admin", "shop_manager", "meet_manager"].includes(user.role) && !user.meetAccess) return sendJson(res, 403, { error: "Ovaj email nema pristup admin, webshop ili meet panelu." });
       if (loginMode === "garage" && !user.garageAccess && user.role !== "admin") return sendJson(res, 403, { error: "Ovaj email nema pristup garazi clanova." });
       if (loginMode === "shop" && !user.shopAccess && user.role !== "admin") return sendJson(res, 403, { error: "Ovaj email nema pristup webshop racunu." });
@@ -1483,6 +1549,12 @@ async function api(req, res, url) {
         }
         target.meetAccess = body.meetAccess === true || body.meetAccess === "on" || nextRole === "admin" || nextRole === "meet_manager";
         target.mustChangePassword = body.mustChangePassword === true || body.mustChangePassword === "on";
+        target.emailVerified = body.emailVerified === true || body.emailVerified === "on" || nextRole === "admin";
+        if (target.emailVerified) {
+          delete target.emailVerificationCode;
+          delete target.emailVerificationToken;
+          delete target.emailVerificationExpiresAt;
+        }
         target.profileImage = body.removeProfileImage ? "" : String(body.profileImage || target.profileImage || "").trim();
         target.coverImage = body.removeCoverImage ? "" : String(body.coverImage || target.coverImage || "").trim();
         target.profile = {
@@ -1560,7 +1632,7 @@ async function api(req, res, url) {
         const meetAccess = body.meetAccess === true || body.meetAccess === "on" || adminAccess;
         const role = adminAccess ? "admin" : meetAccess ? "meet_manager" : garageAccess ? "member" : "customer";
         const userId = slug("u");
-        const newUser = {
+        let newUser = {
           id: userId,
           email,
           username,
@@ -1573,6 +1645,7 @@ async function api(req, res, url) {
           mustChangePassword: true,
           createdAt: new Date().toISOString()
         };
+        if (email) newUser = prepareEmailVerification(newUser); else newUser.emailVerified = true;
         db.users.push(newUser);
         let member = null;
         if (garageAccess) {
@@ -1590,7 +1663,12 @@ async function api(req, res, url) {
           db.members.unshift(member);
         }
         saveDb(db);
-        if (email) appendMail(email, "Tuning Crew Cuneri pristup", `Login: ${email}\nUsername: ${username}\nPrivremena lozinka: ${tempPassword}\nNakon prijave moras odmah promijeniti lozinku.`);
+        if (email) {
+          const intro = garageAccess
+            ? "Postao/la si clan autokluba Tuning Crew Cuneri. Prije prve prijave potvrdi email, zatim se prijavi privremenom lozinkom i promijeni je."
+            : "Dodan ti je Tuning Crew Cuneri pristup. Prije prve prijave potvrdi email, zatim se prijavi privremenom lozinkom i promijeni je.";
+          appendMail(email, "Tuning Crew Cuneri pristup i verifikacija", `${intro}\n\nLogin: ${email}\nUsername: ${username}\nPrivremena lozinka: ${tempPassword}\n\n${verificationMail(req, newUser, "Potvrda emaila:")}`);
+        }
         return sendJson(res, 201, { user: publicUser(newUser), member });
       }
 

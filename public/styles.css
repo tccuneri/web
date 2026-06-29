@@ -460,7 +460,7 @@ input:focus, textarea:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px r
 .access-login .login-box h1{font-size:clamp(38px,5vw,58px);margin:10px 0 18px;text-transform:uppercase}
 .access-login .login-box p{color:#cbd4d7;line-height:1.6}
 .access-login .admin-form{margin-top:24px}.access-login .admin-form .btn{margin-top:5px;width:100%}
-.login-links{display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:flex-start}
+.login-links{display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:space-between}
 .login-side{display:grid;grid-template-columns:1fr;gap:16px;align-content:start}
 .login-side .form-box{align-content:start;padding:25px}
 .login-side .form-box h3{margin:0 0 12px;font-size:22px;text-transform:uppercase}
