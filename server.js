@@ -702,6 +702,26 @@ function canAdminMeets(user) {
   return Boolean(user && user.role === "admin");
 }
 
+function ensureMemberProfile(db, user, data = {}) {
+  let member = db.members.find(item => item.userId === user.id);
+  if (!member) {
+    member = { id: slug("m"), userId: user.id, email: user.email || user.username || "", cars: [] };
+    db.members.unshift(member);
+  }
+  member.name = data.name || user.name || user.email || user.username || "Clan";
+  member.email = data.email || user.email || user.username || "";
+  member.instagram = data.instagram ?? member.instagram ?? "";
+  member.tiktok = data.tiktok ?? member.tiktok ?? "";
+  member.profileImage = user.profileImage || member.profileImage || "";
+  member.coverImage = user.coverImage || member.coverImage || "";
+  member.bio = data.bio ?? member.bio ?? "";
+  member.bioEn = data.bioEn ?? member.bioEn ?? "";
+  member.competitions = data.competitions ?? member.competitions ?? "";
+  member.competitionsEn = data.competitionsEn ?? member.competitionsEn ?? "";
+  member.cars = Array.isArray(data.cars) ? data.cars : (member.cars || []);
+  return member;
+}
+
 function memberCarText(member, carId) {
   const cars = member?.cars || [];
   const car = cars.find(item => item.id === carId) || cars[0];
@@ -1429,6 +1449,14 @@ async function api(req, res, url) {
         if (!target) return sendJson(res, 404, { error: "Korisnik nije pronaden." });
         target.shopAccess = body.shopAccess === true || body.shopAccess === "on";
         target.garageAccess = body.garageAccess === true || body.garageAccess === "on";
+        if (target.garageAccess) {
+          target.shopAccess = true;
+          if (target.role === "customer") target.role = "member";
+          ensureMemberProfile(db, target);
+        } else if (target.role === "member") {
+          target.role = "customer";
+          db.members = db.members.filter(item => item.userId !== target.id);
+        }
         target.meetAccess = body.meetAccess === true || body.meetAccess === "on" || ["admin", "meet_manager"].includes(target.role);
         saveDb(db);
         return sendJson(res, 200, { user: publicUser(target) });
@@ -1447,6 +1475,12 @@ async function api(req, res, url) {
         target.role = nextRole;
         target.shopAccess = body.shopAccess === true || body.shopAccess === "on";
         target.garageAccess = body.garageAccess === true || body.garageAccess === "on";
+        if (target.garageAccess) {
+          target.shopAccess = true;
+          if (target.role === "customer") target.role = "member";
+        } else if (target.role === "member") {
+          target.role = "customer";
+        }
         target.meetAccess = body.meetAccess === true || body.meetAccess === "on" || nextRole === "admin" || nextRole === "meet_manager";
         target.mustChangePassword = body.mustChangePassword === true || body.mustChangePassword === "on";
         target.profileImage = body.removeProfileImage ? "" : String(body.profileImage || target.profileImage || "").trim();
@@ -1463,21 +1497,17 @@ async function api(req, res, url) {
         };
         target.shopProfile = { ...(target.shopProfile || {}), ...target.profile };
 
-        if (body.member) {
-          let member = db.members.find(item => item.userId === target.id);
-          if (!member) {
-            member = { id: slug("m"), userId: target.id, email: target.email, cars: [] };
-            db.members.unshift(member);
-          }
-          member.name = body.member.name || target.name || target.email;
-          member.email = body.member.email || target.email;
-          member.instagram = body.member.instagram || "";
-          member.tiktok = body.member.tiktok || "";
-          member.profileImage = target.profileImage || "";
-          member.coverImage = target.coverImage || "";
-          member.bio = body.member.bio || "";
-          member.competitions = body.member.competitions || "";
-          member.cars = Array.isArray(body.member.cars) ? body.member.cars.map(car => ({
+        if (target.garageAccess && body.member) {
+          ensureMemberProfile(db, target, {
+            name: body.member.name || target.name || target.email,
+            email: body.member.email || target.email,
+            instagram: body.member.instagram || "",
+            tiktok: body.member.tiktok || "",
+            bio: body.member.bio || "",
+            bioEn: body.member.bioEn || "",
+            competitions: body.member.competitions || "",
+            competitionsEn: body.member.competitionsEn || "",
+            cars: Array.isArray(body.member.cars) ? body.member.cars.map(car => ({
             id: car.id || slug("c"),
             name: car.name || "Auto",
             cover: car.cover || "/assets/hero-garage.svg",
@@ -1488,10 +1518,11 @@ async function api(req, res, url) {
             detailsEn: car.detailsEn || "",
             competesIn: car.competesIn || "",
             competesInEn: car.competesInEn || ""
-          })).filter(car => car.name.trim()) : [];
+            })).filter(car => car.name.trim()) : []
+          });
         }
 
-        if (body.deleteMemberProfile === true) db.members = db.members.filter(item => item.userId !== target.id);
+        if (!target.garageAccess || body.deleteMemberProfile === true) db.members = db.members.filter(item => item.userId !== target.id);
         saveDb(db);
         return sendJson(res, 200, { user: publicUser(target), member: db.members.find(item => item.userId === target.id) || null });
       }
@@ -1523,7 +1554,7 @@ async function api(req, res, url) {
         if (!username) return sendJson(res, 400, { error: "Username nije ispravan." });
         if (email && db.users.some(item => String(item.email || "").toLowerCase() === email)) return sendJson(res, 409, { error: "Korisnik s tim emailom vec postoji." });
         if (db.users.some(item => String(item.username || "").toLowerCase() === username)) return sendJson(res, 409, { error: "Korisnik s tim usernameom vec postoji." });
-        const shopAccess = body.shopAccess === true || body.shopAccess === "on";
+        const shopAccess = body.shopAccess === true || body.shopAccess === "on" || body.garageAccess === true || body.garageAccess === "on";
         const garageAccess = body.garageAccess === true || body.garageAccess === "on";
         const adminAccess = body.adminAccess === true || body.adminAccess === "on";
         const meetAccess = body.meetAccess === true || body.meetAccess === "on" || adminAccess;

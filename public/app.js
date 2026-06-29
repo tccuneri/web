@@ -654,7 +654,7 @@ function accessUserRow(user) {
     <input type="hidden" name="id" value="${user.id}" />
     <div><strong>${escapeHtml(user.name || identifier)}</strong><small>${escapeHtml(identifier)} · ${escapeHtml(user.role)}</small></div>
     <label class="check-label"><input type="checkbox" name="shopAccess" ${user.shopAccess ? "checked" : ""} /> Webshop</label>
-    <label class="check-label"><input type="checkbox" name="garageAccess" ${user.garageAccess ? "checked" : ""} /> Garaza</label>
+    <label class="check-label"><input type="checkbox" name="garageAccess" ${user.garageAccess ? "checked" : ""} /> Clan autokluba</label>
     <label class="check-label"><input type="checkbox" name="meetAccess" ${user.meetAccess || user.role === "meet_manager" ? "checked" : ""} /> Meet</label>
     <button class="btn secondary" type="button" data-edit-user="${user.id}">Uredi sve</button>
     <button class="btn secondary">Spremi</button>
@@ -673,12 +673,12 @@ function adminAddUserForm() {
     <label>Email ili username<input required name="identifier" placeholder="npr. voditelj01 ili ime@email.com" /></label>
     <label>Prikazno ime<input name="displayName" placeholder="npr. Voditelj Meet 01" /></label>
     <label>${tr("tempPassword")}<input name="tempPassword" value="ulaz123ulaz" minlength="8" /></label>
-    <label class="check-label"><input type="checkbox" name="garageAccess" checked /> Clan autokluba / garaza</label>
-    <label class="check-label"><input type="checkbox" name="shopAccess" /> Webshop korisnik</label>
+    <label class="check-label"><input type="checkbox" name="shopAccess" checked /> Webshop korisnik</label>
+    <label class="check-label"><input type="checkbox" name="garageAccess" /> Clan autokluba</label>
     <label class="check-label"><input type="checkbox" name="meetAccess" /> Meet organizer</label>
     <label class="check-label"><input type="checkbox" name="adminAccess" /> Admin za sve</label>
     <button class="btn" type="submit">Dodaj korisnika</button>
-    <p class="admin-help">Ako upises samo username, korisnik se prijavljuje usernameom i privremenom lozinkom. Email se salje samo kad je upisana prava email adresa.</p>
+    <p class="admin-help">Registracija kupca sama otvara samo webshop racun. Clan autokluba postaje tek kad admin ukljuci ovu kvacicu ili doda korisnika kao clana.</p>
   </form></div>`;
 }
 
@@ -737,7 +737,7 @@ function openAdminUserEditor(userId) {
           ${["member", "customer", "meet_manager", "shop_manager", "admin"].map(role => `<option value="${role}"${selected(user.role, role)}>${role === "admin" ? "Admin za sve" : role === "shop_manager" ? "Admin za webshop" : role === "meet_manager" ? "Voditelj meetova" : role}</option>`).join("")}
         </select></label>
         <label class="check-label"><input type="checkbox" name="shopAccess" ${user.shopAccess ? "checked" : ""} /> Webshop pristup</label>
-        <label class="check-label"><input type="checkbox" name="garageAccess" ${user.garageAccess ? "checked" : ""} /> Garaza pristup</label>
+        <label class="check-label"><input type="checkbox" name="garageAccess" ${user.garageAccess ? "checked" : ""} /> Clan autokluba</label>
         <label class="check-label"><input type="checkbox" name="meetAccess" ${user.meetAccess || user.role === "meet_manager" ? "checked" : ""} /> Meet panel pristup</label>
         <label class="check-label"><input type="checkbox" name="mustChangePassword" ${user.mustChangePassword ? "checked" : ""} /> Mora promijeniti lozinku</label>
         <label>Ime<input name="firstName" value="${escapeHtml(profile.firstName || "")}" /></label>
@@ -1279,7 +1279,7 @@ function eventDetail(event) {
   const canAdminMeet = event.canAdminMeet || state.user?.role === "admin";
   const clubMeet = Boolean(event.clubMeet);
   const actions = clubMeet
-    ? `${state.user && (state.user.garageAccess || state.user.role === "admin") ? loggedInAttend(event, cars, isAttending) : state.user ? "" : `<a class="btn" href="/login-clanovi" data-link>${ui("Login za clanove", "Member login")}</a>`}${canManageMeet ? `<button class="btn secondary" data-toggle-attendees="${event.id}">${ui("Popis dolazaka", "Attendee list")} (${count})</button><a class="btn secondary" href="/api/meet-manager/event/export?eventId=${encodeURIComponent(event.id)}">${ui("Download Excel", "Download Excel")}</a>` : ""}`
+    ? `${state.user && (state.user.garageAccess || state.user.role === "admin") ? loggedInAttend(event, cars, isAttending) : state.user ? "" : `<a class="btn" href="/webshop-login" data-link>${ui("Prijavi se", "Sign in")}</a>`}${canManageMeet ? `<button class="btn secondary" data-toggle-attendees="${event.id}">${ui("Popis dolazaka", "Attendee list")} (${count})</button><a class="btn secondary" href="/api/meet-manager/event/export?eventId=${encodeURIComponent(event.id)}">${ui("Download Excel", "Download Excel")}</a>` : ""}`
     : `${state.user && (state.user.garageAccess || state.user.role === "admin") ? loggedInAttend(event, cars, isAttending) : `<button class="btn" data-attend="${event.id}">${ui("DOLAZIM", "ATTEND")}</button>`}<button class="btn secondary" data-toggle-attendees="${event.id}">${ui("Popis dolazaka", "Attendee list")} (${count})</button>${canAdminMeet ? `<button class="btn secondary" type="button" data-enable-club-meet="${event.id}">${ui("Pretvori u klupski meet", "Make club meet")}</button>` : ""}`;
   return `<div class="event-detail-backdrop" data-close-event></div><article class="event-card event-card-detail" id="${event.id}">
     <button class="map-close event-close" data-close-event aria-label="Zatvori">&times;</button>
@@ -1568,8 +1568,8 @@ function loginPage() {
 }
 
 function accessLoginPage(mode) {
-  const isGarage = mode === "garage";
-  app.innerHTML = `<section class="login-shell access-login"><div class="access-login-grid"><div class="login-box"><span class="kicker">${isGarage ? "CLUB GARAGE" : "CUNERI STORE"}</span><h1>${isGarage ? "Prijava clanova" : "Webshop login"}</h1><p>${isGarage ? "Pristup imaju samo email adrese koje je odobrio administrator kluba." : "Prijavi se za spremljene adrese i pregled narudzbi. Kupnja kao gost i dalje je moguca."}</p><form class="admin-form" data-form="login"><input type="hidden" name="loginMode" value="${mode}" /><label>Email / username<input required name="username" /></label><label>Lozinka<input required type="password" name="password" /></label><button class="btn">Prijava</button></form><a class="text-link" href="${isGarage ? "/webshop-login" : "/login-clanovi"}" data-link>${isGarage ? "Idi na webshop login" : "Idi na login za clanove"}</a></div>${isGarage ? "" : `<div class="login-side"><form class="form-box" data-form="shop-reset"><h3>Zaboravljena lozinka</h3><label>Email<input required type="email" name="email" /></label><button class="btn secondary">Posalji reset email</button></form><form class="form-box" data-form="shop-register"><h3>Postani webshop korisnik</h3><label>Ime<input required name="firstName" /></label><label>Prezime<input required name="lastName" /></label><label>Email<input required type="email" name="email" /></label><label>Lozinka<input required minlength="8" type="password" name="password" /></label><label>Ponovi lozinku<input required minlength="8" type="password" name="passwordConfirm" /></label><button class="btn">Registracija</button></form></div>`}</div></section>`;
+  const isAdmin = mode === "admin";
+  app.innerHTML = `<section class="login-shell access-login"><div class="access-login-grid"><div class="login-box"><span class="kicker">${isAdmin ? "CUNERI ADMIN" : "CUNERI STORE"}</span><h1>${isAdmin ? "Admin login" : "Webshop login"}</h1><p>${isAdmin ? "Admin tim se prijavljuje ovdje." : "Prijavi se za webshop. Clan autokluba postajes tek kad te admin oznaci kao clana."}</p><form class="admin-form" data-form="login"><input type="hidden" name="loginMode" value="${isAdmin ? "admin" : "shop"}" /><label>Email / username<input required name="username" /></label><label>Lozinka<input required type="password" name="password" /></label><button class="btn">Prijava</button></form><a class="text-link" href="${isAdmin ? "/webshop-login" : "/admin"}" data-link>${isAdmin ? "Idi na webshop login" : "ADMIN"}</a></div>${isAdmin ? "" : `<div class="login-side"><form class="form-box" data-form="shop-reset"><h3>Zaboravljena lozinka</h3><label>Email<input required type="email" name="email" /></label><button class="btn secondary">Posalji reset email</button></form><form class="form-box" data-form="shop-register"><h3>Postani webshop korisnik</h3><label>Ime<input required name="firstName" /></label><label>Prezime<input required name="lastName" /></label><label>Email<input required type="email" name="email" /></label><label>Lozinka<input required minlength="8" type="password" name="password" /></label><label>Ponovi lozinku<input required minlength="8" type="password" name="passwordConfirm" /></label><button class="btn">Registracija</button></form></div>`}</div></section>`;
 }
 
 async function adminPage() {
@@ -2289,7 +2289,7 @@ function eventDetail(event) {
   const canAdminMeet = event.canAdminMeet || state.user?.role === "admin";
   const clubMeet = Boolean(event.clubMeet);
   const actions = clubMeet
-    ? `${state.user && (state.user.garageAccess || state.user.role === "admin") ? loggedInAttend(event, cars, isAttending) : state.user ? "" : `<a class="btn" href="/login-clanovi" data-link>${ui("Login za clanove", "Member login")}</a>`}${canManageMeet ? `<button class="btn secondary" data-toggle-attendees="${event.id}">${ui("Popis dolazaka", "Attendee list")} (${count})</button><a class="btn secondary" href="/api/meet-manager/event/export?eventId=${encodeURIComponent(event.id)}">${ui("Download Excel", "Download Excel")}</a>` : ""}`
+    ? `${state.user && (state.user.garageAccess || state.user.role === "admin") ? loggedInAttend(event, cars, isAttending) : state.user ? "" : `<a class="btn" href="/webshop-login" data-link>${ui("Prijavi se", "Sign in")}</a>`}${canManageMeet ? `<button class="btn secondary" data-toggle-attendees="${event.id}">${ui("Popis dolazaka", "Attendee list")} (${count})</button><a class="btn secondary" href="/api/meet-manager/event/export?eventId=${encodeURIComponent(event.id)}">${ui("Download Excel", "Download Excel")}</a>` : ""}`
     : `${state.user && (state.user.garageAccess || state.user.role === "admin") ? loggedInAttend(event, cars, isAttending) : `<button class="btn" data-attend="${event.id}">${ui("DOLAZIM", "ATTEND")}</button>`}<button class="btn secondary" data-toggle-attendees="${event.id}">${ui("Popis dolazaka", "Attendee list")} (${count})</button>${canAdminMeet ? `<button class="btn secondary" type="button" data-enable-club-meet="${event.id}">${ui("Pretvori u klupski meet", "Make club meet")}</button>` : ""}`;
   return `<div class="event-detail-backdrop" data-close-event></div><article class="event-card event-card-detail" id="${event.id}">
     <button class="map-close event-close" data-close-event aria-label="${tr("close")}">&times;</button>
@@ -2444,19 +2444,17 @@ function shopAccountV2(account) {
 }
 
 function accessLoginPage(mode) {
-  const isGarage = mode === "garage";
+  const isGarage = false;
   const isAdmin = mode === "admin";
-  const title = isAdmin ? "Admin login" : isGarage ? ui("Prijava clanova", "Member login") : "Webshop login";
-  const kicker = isAdmin ? "CUNERI ADMIN" : isGarage ? "CLUB GARAGE" : "CUNERI STORE";
+  const title = isAdmin ? "Admin login" : "Webshop login";
+  const kicker = isAdmin ? "CUNERI ADMIN" : "CUNERI STORE";
   const text = isAdmin
-    ? ui("Ovdje se prijavljuju korisnici koji imaju pristup admin panelu, webshop panelu ili oboje. Obicni kupci i clanovi koriste svoje odvojene login stranice.", "Users with access to the admin panel, webshop panel or both sign in here. Regular customers and members use their separate login pages.")
-    : isGarage
-      ? ui("Pristup imaju samo email adrese koje je odobrio administrator kluba.", "Only email addresses approved by the club admin can access the garage.")
-      : ui("Prijavi se za spremljene adrese i pregled narudzbi. Kupnja kao gost i dalje je moguca.", "Sign in for saved addresses and order history. Guest checkout is still available.");
+    ? ui("Ovdje se prijavljuje admin tim za upravljanje stranicom, webshopom, clanovima i meetovima.", "Admins sign in here to manage the site, webshop, members and meets.")
+    : ui("Prijavi se za webshop racun, spremljene adrese i pregled narudzbi. Ako te admin oznaci kao clana autokluba, isti login otvara i clanske mogucnosti.", "Sign in for your webshop account, saved addresses and order history. If an admin marks you as a club member, the same login unlocks member features.");
   const secondaryLinks = isAdmin
     ? `<a class="text-link" href="/webshop-login" data-link>${ui("Idi na webshop login", "Go to webshop login")}</a>`
-    : `<a class="text-link" href="${isGarage ? "/webshop-login" : "/login-clanovi"}" data-link>${isGarage ? ui("Idi na webshop login", "Go to webshop login") : ui("Idi na login za clanove", "Go to member login")}</a><a class="text-link" href="/admin" data-link>ADMIN</a>`;
-  app.innerHTML = `<section class="login-shell access-login"><div class="access-login-grid"><div class="login-box"><span class="kicker">${kicker}</span><h1>${title}</h1><p>${text}</p><form class="admin-form" data-form="login"><input type="hidden" name="loginMode" value="${mode}" /><label>Email / username<input required name="username" /></label><label>${tr("password")}<input required type="password" name="password" /></label><button class="btn">${tr("login")}</button></form><div class="login-links">${secondaryLinks}</div></div>${isGarage || isAdmin ? "" : `<div class="login-side"><form class="form-box" data-form="shop-reset"><h3>${ui("Zaboravljena lozinka", "Forgot password")}</h3><label>${tr("email")}<input required type="email" name="email" /></label><button class="btn secondary">${ui("Posalji reset email", "Send reset email")}</button></form><form class="form-box" data-form="shop-register"><h3>${ui("Postani webshop korisnik", "Create webshop account")}</h3><label>${tr("name")}<input required name="firstName" /></label><label>${tr("lastName")}<input required name="lastName" /></label><label>${tr("email")}<input required type="email" name="email" /></label><label>${tr("password")}<input required minlength="8" type="password" name="password" /></label><label>${ui("Ponovi lozinku", "Repeat password")}<input required minlength="8" type="password" name="passwordConfirm" /></label><button class="btn">${ui("Registracija", "Register")}</button></form></div>`}</div></section>`;
+    : `<a class="text-link" href="/admin" data-link>ADMIN</a>`;
+  app.innerHTML = `<section class="login-shell access-login"><div class="access-login-grid"><div class="login-box"><span class="kicker">${kicker}</span><h1>${title}</h1><p>${text}</p><form class="admin-form" data-form="login"><input type="hidden" name="loginMode" value="${isAdmin ? "admin" : "shop"}" /><label>Email / username<input required name="username" /></label><label>${tr("password")}<input required type="password" name="password" /></label><button class="btn">${tr("login")}</button></form><div class="login-links">${secondaryLinks}</div></div>${isAdmin ? "" : `<div class="login-side"><form class="form-box" data-form="shop-reset"><h3>${ui("Zaboravljena lozinka", "Forgot password")}</h3><label>${tr("email")}<input required type="email" name="email" /></label><button class="btn secondary">${ui("Posalji reset email", "Send reset email")}</button></form><form class="form-box" data-form="shop-register"><h3>${ui("Postani webshop korisnik", "Create webshop account")}</h3><label>${tr("name")}<input required name="firstName" /></label><label>${tr("lastName")}<input required name="lastName" /></label><label>${tr("email")}<input required type="email" name="email" /></label><label>${tr("password")}<input required minlength="8" type="password" name="password" /></label><label>${ui("Ponovi lozinku", "Repeat password")}<input required minlength="8" type="password" name="passwordConfirm" /></label><button class="btn">${ui("Registracija", "Register")}</button></form></div>`}</div></section>`;
 }
 
 async function meetPanelPage() {
@@ -2601,7 +2599,7 @@ function render() {
   else if (path === "/meet-panel") meetPanelPage().catch(error => toast(error.message));
   else if (path === "/profil" || path === "/profile") userProfilePage();
   else if (path === "/login" || path === "/webshop-login") accessLoginPage("shop");
-  else if (path === "/login-clanovi") accessLoginPage("garage");
+  else if (path === "/login-clanovi") accessLoginPage("shop");
   else if (path === "/terms" || path === "/therms") termsPageCurrent();
   else if (path === "/admin") adminPage().catch(error => toast(error.message));
   else errorPage(404, "Ova cesta ne vodi na Cuneri susret.");
