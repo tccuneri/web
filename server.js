@@ -10,8 +10,8 @@ loadEnv(path.join(ROOT, ".env"));
 const PORT = process.env.PORT || 3000;
 const CLUB_EMAIL = process.env.CLUB_EMAIL || "tccuneri@gmail.com";
 const PUBLIC_DIR = path.join(ROOT, "public");
-const DATA_DIR = path.join(ROOT, "data");
-const UPLOAD_DIR = path.join(PUBLIC_DIR, "uploads");
+const DATA_DIR = process.env.DATA_DIR || path.join(ROOT, "data");
+const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(PUBLIC_DIR, "uploads");
 const DB_FILE = path.join(DATA_DIR, "db.json");
 const INBOX_FILE = path.join(DATA_DIR, "email-inbox.json");
 const SESSION_FILE = path.join(DATA_DIR, "sessions.json");
@@ -22,6 +22,7 @@ const types = {
   ".css": "text/css; charset=utf-8",
   ".js": "application/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
+  ".csv": "text/csv; charset=utf-8",
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
@@ -242,6 +243,7 @@ function normalizeDb(db) {
   for (const user of db.users) {
     user.shopAccess ??= ["admin", "shop_manager", "member", "customer"].includes(user.role);
     user.garageAccess ??= ["admin", "member"].includes(user.role);
+    user.meetAccess ??= ["admin", "meet_manager"].includes(user.role);
   }
   db.products ||= defaultProducts();
   db.orders ||= [];
@@ -263,6 +265,7 @@ function normalizeEvent(event) {
   const normalized = { ...event };
   normalized.id ||= slug("e");
   normalized.attendees ||= [];
+  normalized.clubMeet = normalized.clubMeet === true || normalized.clubMeet === "true" || normalized.clubMeet === "on";
   const locationText = normalized.location || normalized.address || normalized.description || normalized.city || "";
   const inferredCity = inferCity(locationText);
   const previousCity = normalized.city || "";
@@ -346,6 +349,15 @@ function sendJson(res, status, payload) {
   res.end(body);
 }
 
+function sendText(res, status, body, headers = {}) {
+  res.writeHead(status, {
+    "Content-Type": "text/plain; charset=utf-8",
+    "Content-Length": Buffer.byteLength(body),
+    ...headers
+  });
+  res.end(body);
+}
+
 function parseBody(req) {
   return new Promise((resolve, reject) => {
     let body = "";
@@ -393,7 +405,15 @@ function currentUser(req, db) {
     saveSessions();
     return null;
   }
-  return db.users.find(user => user.id === session.userId) || null;
+  const user = db.users.find(user => user.id === session.userId) || null;
+  if (user) {
+    session.lastSeenAt = Date.now();
+    session.userAgent = req.headers["user-agent"] || "";
+    session.ip = req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "";
+    sessions.set(sid, session);
+    saveSessions();
+  }
+  return user;
 }
 
 function requireUser(req, res, db) {
@@ -654,12 +674,167 @@ function saveUpload(fileName, dataUrl) {
   return `/uploads/${outName}`;
 }
 
-function publicAttendees(event) {
-  return (event.attendees || []).map(item => ({
+function publicAttendees(event, db = null, detailed = false) {
+  return (event.attendees || []).map(item => {
+    const member = detailed && db ? db.members.find(m => m.id === item.memberId || m.userId === item.userId) : null;
+    const user = detailed && db ? db.users.find(u => u.id === item.userId || u.id === member?.userId) : null;
+    return {
     id: item.id,
-    name: item.name || "Gost",
-    car: item.car || "Auto"
-  }));
+    memberId: item.memberId || "",
+    userId: item.userId || "",
+    name: member?.name || item.name || "Gost",
+    car: item.car || memberCarText(member, item.carId) || "Auto",
+    ...(detailed ? {
+      email: member?.email || user?.email || "",
+      instagram: member?.instagram || item.instagram || "",
+      tiktok: member?.tiktok || "",
+      images: memberImages(member)
+    } : {})
+  };
+  });
+}
+
+function canManageMeets(user) {
+  return Boolean(user && (user.meetAccess || ["admin", "meet_manager"].includes(user.role)));
+}
+
+function canAdminMeets(user) {
+  return Boolean(user && user.role === "admin");
+}
+
+function memberCarText(member, carId) {
+  const cars = member?.cars || [];
+  const car = cars.find(item => item.id === carId) || cars[0];
+  return car?.name || "Auto clana";
+}
+
+function memberImages(member) {
+  if (!member) return [];
+  const images = [];
+  if (member.profileImage) images.push(member.profileImage);
+  if (member.coverImage) images.push(member.coverImage);
+  for (const car of member.cars || []) {
+    if (car.cover) images.push(car.cover);
+    if (Array.isArray(car.images)) images.push(...car.images);
+  }
+  return [...new Set(images.filter(Boolean))];
+}
+
+function attendeeFromMember(member, carId) {
+  return {
+    id: slug("a"),
+    memberId: member.id,
+    userId: member.userId || null,
+    name: member.name || member.email || "Clan",
+    car: memberCarText(member, carId),
+    createdAt: new Date().toISOString()
+  };
+}
+
+function activeUsers(db) {
+  const activeMs = 5 * 60 * 1000;
+  const latestByUser = new Map();
+  const now = Date.now();
+  for (const session of sessions.values()) {
+    if (!session.userId) continue;
+    if (now - Number(session.createdAt || 0) > 7 * 24 * 60 * 60 * 1000) continue;
+    const lastSeenAt = Number(session.lastSeenAt || session.createdAt || 0);
+    const existing = latestByUser.get(session.userId);
+    if (!existing || lastSeenAt > existing.lastSeenAt) latestByUser.set(session.userId, { lastSeenAt, userAgent: session.userAgent || "", ip: session.ip || "" });
+  }
+  return db.users.map(user => {
+    const activity = latestByUser.get(user.id) || {};
+    const lastSeenAt = Number(activity.lastSeenAt || 0);
+    return {
+      id: user.id,
+      name: user.name || user.email,
+      email: user.email,
+      username: user.username || "",
+      role: user.role,
+      online: Boolean(lastSeenAt && now - lastSeenAt <= activeMs),
+      lastSeenAt: lastSeenAt ? new Date(lastSeenAt).toISOString() : "",
+      userAgent: activity.userAgent || ""
+    };
+  }).sort((a, b) => Number(b.online) - Number(a.online) || String(b.lastSeenAt).localeCompare(String(a.lastSeenAt)) || String(a.email).localeCompare(String(b.email)));
+}
+
+function csvCell(value) {
+  return `"${String(value ?? "").replace(/"/g, '""')}"`;
+}
+
+function htmlCell(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+}
+
+function absoluteAsset(req, value) {
+  if (!value) return "";
+  if (/^https?:\/\//i.test(value)) return value;
+  const host = req.headers.host || `localhost:${PORT}`;
+  return `http://${host}${String(value).startsWith("/") ? value : `/${value}`}`;
+}
+
+function meetCsv(event, db, req) {
+  const rows = [["Ime i prezime", "Automobil", "Instagram", "TikTok", "Slike"]];
+  for (const attendee of publicAttendees(event, db, true)) {
+    rows.push([
+      attendee.name,
+      attendee.car,
+      attendee.instagram,
+      attendee.tiktok,
+      (attendee.images || []).map(image => absoluteAsset(req, image)).join(" | ")
+    ]);
+  }
+  return `\uFEFF${rows.map(row => row.map(csvCell).join(";")).join("\r\n")}`;
+}
+
+function meetExcel(event, db, req) {
+  const attendees = publicAttendees(event, db, true);
+  const title = event.title || "Cuneri meet";
+  const dateLine = [event.date, event.time, event.location || event.city].filter(Boolean).join(" - ");
+  const rows = attendees.map((attendee, index) => {
+    const instagram = attendee.instagram ? String(attendee.instagram).replace(/^@/, "") : "";
+    const tiktok = attendee.tiktok ? String(attendee.tiktok).replace(/^@/, "") : "";
+    const imageLinks = (attendee.images || []).map((image, imageIndex) => {
+      const url = absoluteAsset(req, image);
+      return `<a href="${htmlCell(url)}">Slika ${imageIndex + 1}</a>`;
+    }).join("<br>");
+    const preview = attendee.images?.[0] ? `<img src="${htmlCell(absoluteAsset(req, attendee.images[0]))}" width="120" height="70" />` : "";
+    return `<tr>
+      <td class="num">${index + 1}</td>
+      <td class="strong">${htmlCell(attendee.name)}</td>
+      <td>${htmlCell(attendee.car)}</td>
+      <td>${instagram ? `<a href="https://www.instagram.com/${htmlCell(instagram)}">@${htmlCell(instagram)}</a>` : ""}</td>
+      <td>${tiktok ? `<a href="https://www.tiktok.com/@${htmlCell(tiktok)}">@${htmlCell(tiktok)}</a>` : ""}</td>
+      <td>${preview}</td>
+      <td>${imageLinks}</td>
+    </tr>`;
+  }).join("");
+  return `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    body { font-family: Arial, sans-serif; color: #111827; }
+    h1 { margin: 0; font-size: 26px; }
+    .meta { margin: 6px 0 18px; color: #4b5563; font-size: 14px; }
+    table { border-collapse: collapse; width: 100%; }
+    th { background: #07121f; color: #ffffff; font-weight: 700; text-transform: uppercase; }
+    th, td { border: 1px solid #9ca3af; padding: 10px; vertical-align: top; }
+    tr:nth-child(even) td { background: #f3f7fb; }
+    .num { text-align: center; font-weight: 700; width: 44px; }
+    .strong { font-weight: 700; }
+    a { color: #0b63ce; }
+  </style>
+</head>
+<body>
+  <h1>${htmlCell(title)}</h1>
+  <div class="meta">${htmlCell(dateLine)} | Clanova na popisu: ${attendees.length}</div>
+  <table>
+    <thead><tr><th>#</th><th>Ime i prezime</th><th>Automobil</th><th>Instagram</th><th>TikTok</th><th>Slika</th><th>Linkovi slika</th></tr></thead>
+    <tbody>${rows || `<tr><td colspan="7">Jos nitko nije na popisu.</td></tr>`}</tbody>
+  </table>
+</body>
+</html>`;
 }
 
 function paymentLabel(method) {
@@ -790,11 +965,18 @@ async function api(req, res, url) {
         members: db.members,
         events: db.events.map(event => {
           const { organizerEmail, ...publicEvent } = event;
+          const canSeeAttendees = !event.clubMeet || canManageMeets(viewer);
+          const visibleAttendees = canSeeAttendees
+            ? publicAttendees(event, db, canManageMeets(viewer))
+            : publicAttendees(event).filter(attendee => viewer && attendee.userId === viewer.id);
           return {
             ...publicEvent,
-            attendees: publicAttendees(event).map((attendee, index) => ({
+            attendeeCount: (event.attendees || []).length,
+            canManageMeet: canManageMeets(viewer),
+            canAdminMeet: canAdminMeets(viewer),
+            attendees: visibleAttendees.map(attendee => ({
               ...attendee,
-              mine: Boolean(viewer && event.attendees[index]?.userId === viewer.id)
+              mine: Boolean(viewer && attendee.userId === viewer.id)
             }))
           };
         }),
@@ -1000,18 +1182,25 @@ async function api(req, res, url) {
       if (!event) return sendJson(res, 404, { error: "Susret nije pronađen." });
       event.attendees ||= [];
       const user = currentUser(req, db);
-      if (user) {
-        const member = db.members.find(item => item.userId === user.id);
-        const name = (member?.name || user.name || user.email || "Član").split(" ")[0];
+      if (event.clubMeet && (!user || (!user.garageAccess && user.role !== "admin"))) {
+        return sendJson(res, 403, { error: "Samo prijavljeni clanovi mogu potvrditi dolazak na grupni meet." });
+      }
+      const member = user ? db.members.find(item => item.userId === user.id) : null;
+      const useGuestDetails = !event.clubMeet && body.firstName && body.car && (!member || (!user?.garageAccess && user?.role !== "admin"));
+      if (user && !useGuestDetails) {
+        if (event.clubMeet && !member) return sendJson(res, 403, { error: "Ovaj racun nema povezan profil clana." });
+        const name = member?.name || user.name || user.email || "Clan";
         const car = member?.cars?.find(item => item.id === body.carId) || member?.cars?.[0];
-        const carText = car ? car.name : "Auto člana";
-        const existing = event.attendees.find(item => item.userId === user.id);
-        if (!existing) event.attendees.push({ id: slug("a"), userId: user.id, name, car: carText, createdAt: new Date().toISOString() });
+        const carText = car ? car.name : "Auto clana";
+        const existing = event.attendees.find(item => item.userId === user.id || item.memberId === member?.id);
+        if (!existing) event.attendees.push({ id: slug("a"), memberId: member?.id || "", userId: user.id, name, car: carText, createdAt: new Date().toISOString() });
       } else {
-        if (!body.firstName || !body.lastName || !body.car) return sendJson(res, 400, { error: "Gost mora upisati ime, prezime i auto." });
+        if (!body.firstName || !body.car) return sendJson(res, 400, { error: "Gost mora upisati ime i auto." });
+        const guestName = [body.firstName, body.lastName].filter(Boolean).join(" ");
         event.attendees.push({
           id: slug("a"),
-          name: body.firstName,
+          userId: user?.id || "",
+          name: guestName,
           lastName: body.lastName,
           instagram: body.instagram || "",
           car: body.car,
@@ -1020,6 +1209,88 @@ async function api(req, res, url) {
       }
       saveDb(db);
       return sendJson(res, 201, { attendees: publicAttendees(event) });
+    }
+
+    if (route.startsWith("/api/meet-manager")) {
+      const user = requireUser(req, res, db);
+      if (!user) return;
+      if (!canManageMeets(user)) return sendJson(res, 403, { error: "Pristup meet panelu je potreban." });
+
+      if (method === "GET" && route === "/api/meet-manager") {
+        return sendJson(res, 200, {
+          events: db.events.filter(event => event.clubMeet),
+          members: db.members.map(member => ({
+            id: member.id,
+            userId: member.userId || "",
+            name: member.name || member.email || "Clan",
+            email: member.email || "",
+            cars: member.cars || []
+          }))
+        });
+      }
+
+      if (method === "GET" && route === "/api/meet-manager/event/export") {
+        const event = db.events.find(item => item.id === url.searchParams.get("eventId") && item.clubMeet);
+        if (!event) return sendJson(res, 404, { error: "Grupni meet nije pronaden." });
+        const fileName = `${String(event.title || "meet-popis").replace(/[^a-z0-9_-]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() || "meet-popis"}.xls`;
+        return sendText(res, 200, meetExcel(event, db, req), {
+          "Content-Type": "application/vnd.ms-excel; charset=utf-8",
+          "Content-Disposition": `attachment; filename="${fileName}"`
+        });
+      }
+
+      if (method === "POST" && route === "/api/meet-manager/event") {
+        if (!canAdminMeets(user)) return sendJson(res, 403, { error: "Samo admin moze dodavati klupski meet." });
+        const body = await parseBody(req);
+        if (!body.title || !body.location || !body.date || !body.time) return sendJson(res, 400, { error: "Naziv, lokacija, datum i vrijeme su obavezni." });
+        const event = normalizeEvent({
+          id: slug("e"),
+          title: String(body.title).slice(0, 100),
+          city: String(body.city || "").slice(0, 60),
+          location: String(body.location).slice(0, 180),
+          date: body.date,
+          time: body.time,
+          description: String(body.description || "Cuneri grupni odlazak na meet.").slice(0, 1200),
+          image: body.image || "/assets/meet-lineup.svg",
+          clubMeet: true,
+          organizerName: user.name || user.email,
+          organizerEmail: user.email,
+          createdAt: new Date().toISOString(),
+          attendees: []
+        });
+        db.events.push(event);
+        saveDb(db);
+        return sendJson(res, 201, { event });
+      }
+
+      if (method === "PUT" && route === "/api/meet-manager/event") {
+        if (!canAdminMeets(user)) return sendJson(res, 403, { error: "Samo admin moze pretvoriti event u klupski meet." });
+        const body = await parseBody(req);
+        const event = db.events.find(item => item.id === body.eventId);
+        if (!event) return sendJson(res, 404, { error: "Meet nije pronaden." });
+        event.clubMeet = body.clubMeet === true || body.clubMeet === "true" || body.clubMeet === "on";
+        event.attendees ||= [];
+        saveDb(db);
+        return sendJson(res, 200, { event });
+      }
+
+      if (method === "PUT" && route === "/api/meet-manager/attendee") {
+        if (!canAdminMeets(user)) return sendJson(res, 403, { error: "Samo admin moze mijenjati clanove na popisu." });
+        const body = await parseBody(req);
+        const event = db.events.find(item => item.id === body.eventId && item.clubMeet);
+        if (!event) return sendJson(res, 404, { error: "Grupni meet nije pronaden." });
+        event.attendees ||= [];
+        if (body.action === "remove") {
+          event.attendees = event.attendees.filter(item => item.id !== body.attendeeId && item.memberId !== body.memberId);
+        } else {
+          const member = db.members.find(item => item.id === body.memberId);
+          if (!member) return sendJson(res, 404, { error: "Clan nije pronaden." });
+          const existing = event.attendees.find(item => item.memberId === member.id || item.userId && item.userId === member.userId);
+          if (!existing) event.attendees.push(attendeeFromMember(member, body.carId));
+        }
+        saveDb(db);
+        return sendJson(res, 200, { event });
+      }
     }
 
     if (method === "POST" && route === "/api/event") {
@@ -1058,11 +1329,11 @@ async function api(req, res, url) {
         (login === "admin" && u.role === "admin")
       );
       if (!user || !verifyPassword(password || "", user.passwordHash)) return sendJson(res, 401, { error: "Krivi email ili lozinka." });
-      if (loginMode === "admin" && !["admin", "shop_manager"].includes(user.role)) return sendJson(res, 403, { error: "Ovaj email nema pristup admin ili webshop panelu." });
+      if (loginMode === "admin" && !["admin", "shop_manager", "meet_manager"].includes(user.role) && !user.meetAccess) return sendJson(res, 403, { error: "Ovaj email nema pristup admin, webshop ili meet panelu." });
       if (loginMode === "garage" && !user.garageAccess && user.role !== "admin") return sendJson(res, 403, { error: "Ovaj email nema pristup garazi clanova." });
       if (loginMode === "shop" && !user.shopAccess && user.role !== "admin") return sendJson(res, 403, { error: "Ovaj email nema pristup webshop racunu." });
       const sid = crypto.randomUUID();
-      sessions.set(sid, { userId: user.id, createdAt: Date.now() });
+      sessions.set(sid, { userId: user.id, loginMode: loginMode || "", createdAt: Date.now(), lastSeenAt: Date.now(), userAgent: req.headers["user-agent"] || "", ip: req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "" });
       saveSessions();
       res.setHeader("Set-Cookie", `cuneri_sid=${encodeURIComponent(sid)}; HttpOnly; SameSite=Lax; Path=/; Max-Age=604800`);
       return sendJson(res, 200, { user: publicUser(user) });
@@ -1140,6 +1411,7 @@ async function api(req, res, url) {
       if (method === "GET" && route === "/api/admin/dashboard") {
         return sendJson(res, 200, {
           users: db.users.map(publicUser),
+          activeUsers: activeUsers(db),
           settings: db.settings,
           members: db.members,
           events: db.events,
@@ -1157,6 +1429,7 @@ async function api(req, res, url) {
         if (!target) return sendJson(res, 404, { error: "Korisnik nije pronaden." });
         target.shopAccess = body.shopAccess === true || body.shopAccess === "on";
         target.garageAccess = body.garageAccess === true || body.garageAccess === "on";
+        target.meetAccess = body.meetAccess === true || body.meetAccess === "on" || ["admin", "meet_manager"].includes(target.role);
         saveDb(db);
         return sendJson(res, 200, { user: publicUser(target) });
       }
@@ -1165,7 +1438,7 @@ async function api(req, res, url) {
         const body = await parseBody(req);
         const target = db.users.find(item => item.id === body.id);
         if (!target) return sendJson(res, 404, { error: "Korisnik nije pronaden." });
-        const nextRole = ["admin", "shop_manager", "member", "customer"].includes(body.role) ? body.role : target.role;
+        const nextRole = ["admin", "shop_manager", "meet_manager", "member", "customer"].includes(body.role) ? body.role : target.role;
         if (target.id === user.id && nextRole !== "admin") return sendJson(res, 400, { error: "Ne mozes sam sebi maknuti admin ovlasti." });
         if (target.role === "admin" && nextRole !== "admin" && db.users.filter(item => item.role === "admin").length <= 1) return sendJson(res, 400, { error: "Mora ostati barem jedan admin." });
         target.name = body.name || target.name || target.email;
@@ -1174,6 +1447,7 @@ async function api(req, res, url) {
         target.role = nextRole;
         target.shopAccess = body.shopAccess === true || body.shopAccess === "on";
         target.garageAccess = body.garageAccess === true || body.garageAccess === "on";
+        target.meetAccess = body.meetAccess === true || body.meetAccess === "on" || nextRole === "admin" || nextRole === "meet_manager";
         target.mustChangePassword = body.mustChangePassword === true || body.mustChangePassword === "on";
         target.profileImage = body.removeProfileImage ? "" : String(body.profileImage || target.profileImage || "").trim();
         target.coverImage = body.removeCoverImage ? "" : String(body.coverImage || target.coverImage || "").trim();
@@ -1241,44 +1515,64 @@ async function api(req, res, url) {
       if (method === "POST" && route === "/api/admin/member") {
         const body = await parseBody(req);
         const tempPassword = body.tempPassword || "ulaz123ulaz";
+        const identifier = String(body.identifier || body.email || body.username || "").trim();
+        if (!identifier) return sendJson(res, 400, { error: "Upisi email ili username." });
+        const isEmail = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(identifier);
+        const email = isEmail ? identifier.toLowerCase() : "";
+        const username = String(body.username || (isEmail ? identifier.split("@")[0] : identifier)).trim().toLowerCase();
+        if (!username) return sendJson(res, 400, { error: "Username nije ispravan." });
+        if (email && db.users.some(item => String(item.email || "").toLowerCase() === email)) return sendJson(res, 409, { error: "Korisnik s tim emailom vec postoji." });
+        if (db.users.some(item => String(item.username || "").toLowerCase() === username)) return sendJson(res, 409, { error: "Korisnik s tim usernameom vec postoji." });
+        const shopAccess = body.shopAccess === true || body.shopAccess === "on";
+        const garageAccess = body.garageAccess === true || body.garageAccess === "on";
+        const adminAccess = body.adminAccess === true || body.adminAccess === "on";
+        const meetAccess = body.meetAccess === true || body.meetAccess === "on" || adminAccess;
+        const role = adminAccess ? "admin" : meetAccess ? "meet_manager" : garageAccess ? "member" : "customer";
         const userId = slug("u");
-        const memberId = slug("m");
         const newUser = {
           id: userId,
-          email: body.email,
-          name: body.email,
-          role: "member",
+          email,
+          username,
+          name: String(body.displayName || identifier).trim(),
+          role,
+          shopAccess,
+          garageAccess,
+          meetAccess,
           passwordHash: hashPassword(tempPassword),
           mustChangePassword: true,
           createdAt: new Date().toISOString()
         };
-        const member = {
-          id: memberId,
-          userId,
-          name: body.email,
-          email: body.email,
-          instagram: "",
-          tiktok: "",
-          bio: "",
-          competitions: "",
-          cars: []
-        };
         db.users.push(newUser);
-        db.members.unshift(member);
+        let member = null;
+        if (garageAccess) {
+          member = {
+            id: slug("m"),
+            userId,
+            name: newUser.name,
+            email: email || username,
+            instagram: "",
+            tiktok: "",
+            bio: "",
+            competitions: "",
+            cars: []
+          };
+          db.members.unshift(member);
+        }
         saveDb(db);
-        appendMail(body.email, "Tuning Crew Ćuneri pristup", `Email: ${body.email}\nPrivremena lozinka: ${tempPassword}\nNakon prijave moraš odmah promijeniti lozinku.`);
+        if (email) appendMail(email, "Tuning Crew Cuneri pristup", `Login: ${email}\nUsername: ${username}\nPrivremena lozinka: ${tempPassword}\nNakon prijave moras odmah promijeniti lozinku.`);
         return sendJson(res, 201, { user: publicUser(newUser), member });
       }
 
       if (method === "POST" && route === "/api/admin/reset-password") {
         const body = await parseBody(req);
-        const target = db.users.find(item => item.id === body.userId || item.email === body.email);
+        const lookup = String(body.email || body.username || "").toLowerCase();
+        const target = db.users.find(item => item.id === body.userId || String(item.email || "").toLowerCase() === lookup || String(item.username || "").toLowerCase() === lookup);
         if (!target) return sendJson(res, 404, { error: "Korisnik nije pronađen." });
         if (!body.password || String(body.password).length < 8) return sendJson(res, 400, { error: "Lozinka mora imati barem 8 znakova." });
         target.passwordHash = hashPassword(body.password);
         target.mustChangePassword = true;
         saveDb(db);
-        appendMail(target.email, "Tuning Crew Ćuneri nova privremena lozinka", `Email: ${target.email}\nPrivremena lozinka: ${body.password}\nNakon prijave moraš odmah promijeniti lozinku.`);
+        if (target.email) appendMail(target.email, "Tuning Crew Cuneri nova privremena lozinka", `Login: ${target.email || target.username}\nPrivremena lozinka: ${body.password}\nNakon prijave moras odmah promijeniti lozinku.`);
         return sendJson(res, 200, { ok: true });
       }
 
@@ -1323,6 +1617,19 @@ async function api(req, res, url) {
 function serveStatic(req, res, url) {
   let filePath = decodeURIComponent(url.pathname);
   if (filePath === "/") filePath = "/index.html";
+  if (filePath.startsWith("/uploads/")) {
+    const uploadPath = path.normalize(path.join(UPLOAD_DIR, filePath.replace(/^\/uploads\//, "")));
+    if (!uploadPath.startsWith(UPLOAD_DIR)) {
+      res.writeHead(403);
+      return res.end("Forbidden");
+    }
+    if (!fs.existsSync(uploadPath) || fs.statSync(uploadPath).isDirectory()) {
+      res.writeHead(404);
+      return res.end("Not found");
+    }
+    res.writeHead(200, { "Content-Type": types[path.extname(uploadPath).toLowerCase()] || "application/octet-stream" });
+    return fs.createReadStream(uploadPath).pipe(res);
+  }
   const absolute = path.normalize(path.join(PUBLIC_DIR, filePath));
   if (!absolute.startsWith(PUBLIC_DIR)) {
     res.writeHead(403);

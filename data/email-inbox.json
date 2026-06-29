@@ -1,24 +1,24 @@
 [
   {
-    "id": "a8398f07-8f2f-4e6d-870a-b09e8dd8abb9",
+    "id": "c17891b4-2dc2-450f-a9da-3213b7b0294a",
     "to": "lukaveselak22@gmail.com",
-    "subject": "Cuneri webshop - reset lozinke",
-    "text": "Privremena lozinka: shop-1fc38604",
-    "createdAt": "2026-06-28T09:37:28.977Z",
+    "subject": "Tuning Crew Cuneri nova privremena lozinka",
+    "text": "Login: lukaveselak22@gmail.com\nPrivremena lozinka: ulaz123ulaz\nNakon prijave moras odmah promijeniti lozinku.",
+    "createdAt": "2026-06-29T14:07:06.496Z",
     "delivery": {
       "status": "sent",
-      "updatedAt": "2026-06-28T09:37:30.480Z"
+      "updatedAt": "2026-06-29T14:07:08.134Z"
     }
   },
   {
-    "id": "93fef447-a1dc-4175-a76e-e38691656d5a",
-    "to": "tccuneri@gmail.com",
-    "subject": "test",
-    "text": "Ime / Prezime: luka Veselak\nCompany: Nemam\nE-mail: lukaveselak22@gmail.com\n\nMessage:\nluka voli gabi",
-    "createdAt": "2026-06-28T09:36:53.487Z",
+    "id": "ecdcd6a1-f827-4337-8c83-88b689918acb",
+    "subject": "Tuning Crew Ćuneri pristup",
+    "text": "Email: undefined\nPrivremena lozinka: ulaz123ulaz\nNakon prijave moraš odmah promijeniti lozinku.",
+    "createdAt": "2026-06-29T14:01:47.974Z",
     "delivery": {
-      "status": "sent",
-      "updatedAt": "2026-06-28T09:36:55.383Z"
+      "status": "failed",
+      "error": "SMTP 555: 555-5.5.2 Syntax error, cannot decode response. For more information, go to\r\n555-5.5.2  https://support.google.com/a/answer/3221692 and review RFC 5321\r\n555 5.5.2 specifications. 5b1f17b1804b1-49271c1bb11sm213959535e9.4 - gsmtp",
+      "updatedAt": "2026-06-29T14:01:48.806Z"
     }
   },
   {

@@ -31,8 +31,60 @@
     "userId": "u-admin",
     "createdAt": 1782460140949
   },
-  "0dfa1b17-5070-40df-91d7-83b42c22652c": {
+  "dc1047a0-8922-439e-a201-d874c9c27e8c": {
     "userId": "u-admin",
-    "createdAt": 1782470313389
+    "loginMode": "admin",
+    "createdAt": 1782740337768,
+    "lastSeenAt": 1782740337800,
+    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.26100.8655",
+    "ip": "::1"
+  },
+  "59c04167-cd6f-4c46-8e4d-084c5e8cc17f": {
+    "userId": "u-admin",
+    "loginMode": "admin",
+    "createdAt": 1782740353099,
+    "lastSeenAt": 1782740353116,
+    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.26100.8655",
+    "ip": "::1"
+  },
+  "b3b4fb7b-953b-4adc-9101-b547271c28ad": {
+    "userId": "u-admin",
+    "loginMode": "admin",
+    "createdAt": 1782741707866,
+    "lastSeenAt": 1782741708276,
+    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.26100.8655",
+    "ip": "::1"
+  },
+  "2c61b90f-025b-4b41-b614-89d664b17202": {
+    "userId": "u-admin",
+    "loginMode": "admin",
+    "createdAt": 1782741746814,
+    "lastSeenAt": 1782741746985,
+    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.26100.8655",
+    "ip": "::1"
+  },
+  "f4659ad2-6e86-4821-9bc5-2b5f3179d663": {
+    "userId": "u-admin",
+    "loginMode": "admin",
+    "createdAt": 1782742026434,
+    "lastSeenAt": 1782742026450,
+    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.26100.8655",
+    "ip": "::1"
+  },
+  "7f96f239-5f70-4f93-b60c-9ac992b89b77": {
+    "userId": "u-4878008504",
+    "loginMode": "admin",
+    "createdAt": 1782742026575,
+    "lastSeenAt": 1782742026575,
+    "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.26100.8655",
+    "ip": "::1"
+  },
+  "b17d1e86-f71c-4979-aade-f5b1fbcd4b48": {
+    "userId": "u-4878008504",
+    "loginMode": "admin",
+    "createdAt": 1782742532306,
+    "lastSeenAt": 1782742535583,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+    "ip": "::1"
   }
 }

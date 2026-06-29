@@ -10,7 +10,8 @@
       "mustChangePassword": false,
       "createdAt": "2026-06-17T17:33:20.904Z",
       "shopAccess": true,
-      "garageAccess": true
+      "garageAccess": true,
+      "meetAccess": true
     },
     {
       "id": "u-shop-1",
@@ -22,7 +23,8 @@
       "mustChangePassword": false,
       "createdAt": "2026-06-17T21:34:14.498Z",
       "shopAccess": true,
-      "garageAccess": false
+      "garageAccess": false,
+      "meetAccess": false
     },
     {
       "id": "u-shop-2",
@@ -34,19 +36,43 @@
       "mustChangePassword": false,
       "createdAt": "2026-06-17T21:34:14.631Z",
       "shopAccess": true,
-      "garageAccess": false
+      "garageAccess": false,
+      "meetAccess": false
     },
     {
-      "id": "u-a008419ea2",
+      "id": "u-4878008504",
       "email": "lukaveselak22@gmail.com",
-      "name": "lukaveselak22@gmail.com",
-      "role": "member",
-      "passwordHash": "843d7c54c3659faf3f31ed17641f9643:b930899cd9d67301d4488f7fab96a331e7415c494adf98595d2d1f8b0be9c677f9bdee0c3e0a081087de0dde91348c7e9a86580fc8d29a93da94354cdf5ffc7a",
-      "mustChangePassword": true,
-      "createdAt": "2026-06-17T21:34:14.740Z",
-      "shopAccess": true,
-      "garageAccess": true,
-      "username": "lukaveselak22@gmail.com"
+      "username": "veseli",
+      "name": "veseli",
+      "role": "meet_manager",
+      "shopAccess": false,
+      "garageAccess": false,
+      "meetAccess": true,
+      "passwordHash": "835aad20b04f4712539548be03aa244a:cb9efaa83c2b2072601f19f8bdfac4e2722f0f0200cbd62fe9dc3011ce44953e781c9d82344d907d1c06086e73196c44bc2bb75409b50256bbff5f067670dfba",
+      "mustChangePassword": false,
+      "createdAt": "2026-06-29T14:03:51.473Z",
+      "profileImage": "",
+      "coverImage": "",
+      "profile": {
+        "firstName": "",
+        "lastName": "",
+        "phoneCountryCode": "+385",
+        "phone": "",
+        "address": "",
+        "city": "",
+        "postalCode": "",
+        "note": ""
+      },
+      "shopProfile": {
+        "firstName": "",
+        "lastName": "",
+        "phoneCountryCode": "+385",
+        "phone": "",
+        "address": "",
+        "city": "",
+        "postalCode": "",
+        "note": ""
+      }
     }
   ],
   "settings": {
@@ -72,6 +98,19 @@
     ]
   },
   "members": [
+    {
+      "id": "m-673e5c2657",
+      "userId": "u-4878008504",
+      "email": "lukaveselak22@gmail.com",
+      "cars": [],
+      "name": "Veseli",
+      "instagram": "",
+      "tiktok": "",
+      "profileImage": "",
+      "coverImage": "",
+      "bio": "",
+      "competitions": ""
+    },
     {
       "id": "m-1d5af3d026",
       "userId": "u-shop-1",
@@ -144,7 +183,8 @@
       "description": "Vecernje druzenje i zajednicko pranje automobila.",
       "attendees": [],
       "x": 51,
-      "y": 36
+      "y": 36,
+      "clubMeet": false
     },
     {
       "id": "e-zagreb-1",
@@ -155,9 +195,27 @@
       "image": "/assets/hero-night.svg",
       "location": "Zagrebacki Velesajam, Zagreb",
       "description": "Otvoreni nocni susret ljubitelja automobila.",
-      "attendees": [],
+      "attendees": [
+        {
+          "id": "a-d0a9c5cd3c",
+          "memberId": "m-1d5af3d026",
+          "userId": "u-shop-1",
+          "name": "Webshop moderator 1",
+          "car": "Auto clana",
+          "createdAt": "2026-06-29T14:15:18.972Z"
+        },
+        {
+          "id": "a-83cbe7ac29",
+          "memberId": "m-marta",
+          "userId": null,
+          "name": "Marta Kovač",
+          "car": "Turbo Coupe",
+          "createdAt": "2026-06-29T14:15:21.521Z"
+        }
+      ],
       "x": 56,
-      "y": 40
+      "y": 40,
+      "clubMeet": true
     },
     {
       "id": "e-zagreb-2",
@@ -170,7 +228,8 @@
       "description": "Jutarnja kava, fotografiranje i opusteno druzenje.",
       "attendees": [],
       "x": 56,
-      "y": 40
+      "y": 40,
+      "clubMeet": false
     },
     {
       "id": "e-zagreb-3",
@@ -183,7 +242,8 @@
       "description": "Okupljanje prije zajednicke ljetne voznje.",
       "attendees": [],
       "x": 56,
-      "y": 40
+      "y": 40,
+      "clubMeet": false
     },
     {
       "id": "e-vukovar-1",
@@ -196,7 +256,8 @@
       "description": "Susret uz Dunav i vecernje fotografiranje.",
       "attendees": [],
       "x": 68,
-      "y": 43
+      "y": 43,
+      "clubMeet": false
     },
     {
       "id": "e-split-1",
@@ -209,7 +270,8 @@
       "description": "Lagani cruise, fotografiranje i druzenje uz obalu.",
       "attendees": [],
       "x": 48,
-      "y": 72
+      "y": 72,
+      "clubMeet": false
     },
     {
       "id": "e-karlovac-1",
@@ -231,7 +293,8 @@
         }
       ],
       "x": 45,
-      "y": 47
+      "y": 47,
+      "clubMeet": false
     },
     {
       "id": "e-karlovac-2",
@@ -244,7 +307,8 @@
       "description": "Nocno okupljanje i zajednicka voznja.",
       "attendees": [],
       "x": 45,
-      "y": 47
+      "y": 47,
+      "clubMeet": false
     },
     {
       "id": "e-karlovac-3",
@@ -257,7 +321,8 @@
       "description": "Nedjeljno druzenje i razgovor o projektima.",
       "attendees": [],
       "x": 45,
-      "y": 47
+      "y": 47,
+      "clubMeet": false
     },
     {
       "id": "e-karlovac-4",
@@ -270,7 +335,8 @@
       "description": "Zajednicki dan oldtimera i tuning scene.",
       "attendees": [],
       "x": 45,
-      "y": 47
+      "y": 47,
+      "clubMeet": false
     },
     {
       "id": "e-6cb3034128",
@@ -288,7 +354,8 @@
       "createdAt": "2026-06-24T16:39:34.612Z",
       "attendees": [],
       "x": 50,
-      "y": 50
+      "y": 50,
+      "clubMeet": false
     }
   ],
   "posts": [
@@ -538,16 +605,6 @@
     }
   ],
   "contacts": [
-    {
-      "id": "contact-506c8ad1da",
-      "name": "luka",
-      "lastName": "Veselak",
-      "email": "lukaveselak22@gmail.com",
-      "company": "Nemam",
-      "subject": "test",
-      "message": "luka voli gabi",
-      "createdAt": "2026-06-28T09:36:53.456Z"
-    },
     {
       "id": "contact-6ce6c6b6b3",
       "name": "Petra Veselak",

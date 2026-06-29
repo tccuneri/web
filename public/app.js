@@ -649,15 +649,37 @@ function orderPaymentLabel(method) {
 
 function accessUserRow(user) {
   const canDelete = state.user?.id !== user.id;
+  const identifier = user.email || user.username || user.name || "";
   return `<form data-form="user-access" class="access-row">
     <input type="hidden" name="id" value="${user.id}" />
-    <div><strong>${escapeHtml(user.name || user.email)}</strong><small>${escapeHtml(user.email)} · ${escapeHtml(user.role)}</small></div>
+    <div><strong>${escapeHtml(user.name || identifier)}</strong><small>${escapeHtml(identifier)} · ${escapeHtml(user.role)}</small></div>
     <label class="check-label"><input type="checkbox" name="shopAccess" ${user.shopAccess ? "checked" : ""} /> Webshop</label>
     <label class="check-label"><input type="checkbox" name="garageAccess" ${user.garageAccess ? "checked" : ""} /> Garaza</label>
+    <label class="check-label"><input type="checkbox" name="meetAccess" ${user.meetAccess || user.role === "meet_manager" ? "checked" : ""} /> Meet</label>
     <button class="btn secondary" type="button" data-edit-user="${user.id}">Uredi sve</button>
     <button class="btn secondary">Spremi</button>
-    ${canDelete ? `<button class="btn danger" type="button" data-delete-user="${user.id}" data-delete-user-email="${escapeHtml(user.email)}">Obrisi</button>` : `<span class="admin-help">Trenutni admin</span>`}
+    ${canDelete ? `<button class="btn danger" type="button" data-delete-user="${user.id}" data-delete-user-email="${escapeHtml(identifier)}">Obrisi</button>` : `<span class="admin-help">Trenutni admin</span>`}
   </form>`;
+}
+
+function activeUsersPanel(users = []) {
+  return `<div class="panel admin-wide"><h3>Active users</h3><p class="admin-help">Zelena tockica znaci aktivnost u zadnjih 5 minuta. Online korisnici su uvijek na vrhu.</p><div class="active-user-list">
+    ${users.map(user => `<div class="active-user-row ${user.online ? "is-online" : ""}"><span class="active-dot"></span><div><strong>${escapeHtml(user.name || user.email || user.username)}</strong><small>${escapeHtml(user.email || user.username || "")} · ${escapeHtml(user.role || "")}${user.lastSeenAt ? ` · zadnje: ${new Date(user.lastSeenAt).toLocaleString("hr-HR")}` : " · nikad online"}</small></div></div>`).join("") || `<p class="admin-help">Nema korisnika.</p>`}
+  </div></div>`;
+}
+
+function adminAddUserForm() {
+  return `<div class="panel"><h3>Dodaj korisnika</h3><form class="admin-form" data-form="add-member">
+    <label>Email ili username<input required name="identifier" placeholder="npr. voditelj01 ili ime@email.com" /></label>
+    <label>Prikazno ime<input name="displayName" placeholder="npr. Voditelj Meet 01" /></label>
+    <label>${tr("tempPassword")}<input name="tempPassword" value="ulaz123ulaz" minlength="8" /></label>
+    <label class="check-label"><input type="checkbox" name="garageAccess" checked /> Clan autokluba / garaza</label>
+    <label class="check-label"><input type="checkbox" name="shopAccess" /> Webshop korisnik</label>
+    <label class="check-label"><input type="checkbox" name="meetAccess" /> Meet organizer</label>
+    <label class="check-label"><input type="checkbox" name="adminAccess" /> Admin za sve</label>
+    <button class="btn" type="submit">Dodaj korisnika</button>
+    <p class="admin-help">Ako upises samo username, korisnik se prijavljuje usernameom i privremenom lozinkom. Email se salje samo kad je upisana prava email adresa.</p>
+  </form></div>`;
 }
 
 function memberForUser(user) {
@@ -712,10 +734,11 @@ function openAdminUserEditor(userId) {
         <label>Email<input required type="email" name="email" value="${escapeHtml(user.email || "")}" /></label>
         <label>Username<input name="username" value="${escapeHtml(user.username || "")}" /></label>
         <label>Rola<select name="role">
-          ${["member", "customer", "shop_manager", "admin"].map(role => `<option value="${role}"${selected(user.role, role)}>${role === "admin" ? "Admin za sve" : role === "shop_manager" ? "Admin za webshop" : role}</option>`).join("")}
+          ${["member", "customer", "meet_manager", "shop_manager", "admin"].map(role => `<option value="${role}"${selected(user.role, role)}>${role === "admin" ? "Admin za sve" : role === "shop_manager" ? "Admin za webshop" : role === "meet_manager" ? "Voditelj meetova" : role}</option>`).join("")}
         </select></label>
         <label class="check-label"><input type="checkbox" name="shopAccess" ${user.shopAccess ? "checked" : ""} /> Webshop pristup</label>
         <label class="check-label"><input type="checkbox" name="garageAccess" ${user.garageAccess ? "checked" : ""} /> Garaza pristup</label>
+        <label class="check-label"><input type="checkbox" name="meetAccess" ${user.meetAccess || user.role === "meet_manager" ? "checked" : ""} /> Meet panel pristup</label>
         <label class="check-label"><input type="checkbox" name="mustChangePassword" ${user.mustChangePassword ? "checked" : ""} /> Mora promijeniti lozinku</label>
         <label>Ime<input name="firstName" value="${escapeHtml(profile.firstName || "")}" /></label>
         <label>Prezime<input name="lastName" value="${escapeHtml(profile.lastName || "")}" /></label>
@@ -779,6 +802,7 @@ function collectAdminUserEdit(form) {
     role: data.role,
     shopAccess: Boolean(data.shopAccess),
     garageAccess: Boolean(data.garageAccess),
+    meetAccess: Boolean(data.meetAccess),
     mustChangePassword: Boolean(data.mustChangePassword),
     firstName: data.firstName,
     lastName: data.lastName,
@@ -818,6 +842,7 @@ function userProfilePage() {
   const canAdmin = state.user.role === "admin";
   const canShop = state.user.shopAccess || ["admin", "shop_manager"].includes(state.user.role);
   const canGarage = state.user.garageAccess || ["admin", "member"].includes(state.user.role);
+  const canMeet = state.user.meetAccess || ["admin", "meet_manager"].includes(state.user.role);
   const profile = state.user.profile || state.user.shopProfile || {};
   const cover = state.user.coverImage || "/assets/hero-garage.svg";
   app.innerHTML = `
@@ -833,6 +858,7 @@ function userProfilePage() {
           <div class="row-actions">
             ${canAdmin ? `<a class="btn" href="/admin" data-link>${ui("Admin panel", "Admin panel")}</a>` : ""}
             ${canShop ? `<a class="btn secondary" href="/webshop-upravljanje" data-link>${ui("Webshop panel", "Webshop panel")}</a>` : `<a class="btn secondary" href="/webshop" data-link>Webshop</a>`}
+            ${canMeet ? `<a class="btn secondary" href="/meet-panel" data-link>Meet panel</a>` : ""}
             ${canGarage ? `<a class="btn secondary" href="/clanovi" data-link>${ui("Clanovi / garaza", "Members / garage")}</a>` : ""}
             <button class="btn secondary" data-action="logout">${tr("logout")}</button>
           </div>
@@ -866,6 +892,14 @@ async function adminPage() {
   if (!state.user) return accessLoginPage("admin");
   if (state.user.mustChangePassword) {
     app.innerHTML = `<section class="login-shell"><div class="login-box"><span class="kicker">${tr("mustChange")}</span><h1>${tr("changePassword")}</h1><form class="admin-form" data-form="change-password"><label>${tr("newPassword")}<input required type="password" minlength="8" name="password" /></label><button class="btn">${tr("changePassword")}</button></form></div></section>`;
+    return;
+  }
+  if (state.user.role === "meet_manager") {
+    await meetPanelPage();
+    return;
+  }
+  if (state.user.role !== "admin" && (state.user.role === "meet_manager" || state.user.meetAccess)) {
+    await meetPanelPage();
     return;
   }
   if (state.user.role === "shop_manager") {
@@ -1188,8 +1222,17 @@ function eventCard(event) {
 
 function attendeeList(event) {
   const attendees = event.attendees || [];
-  if (!attendees.length) return `<p class="admin-help">Još nema prijavljenih dolazaka.</p>`;
-  return attendees.map(item => `<div class="attendee-row"><strong>${escapeHtml(item.name || "Gost")}</strong><span>${escapeHtml(item.car || "Auto")}</span></div>`).join("");
+  const canManageMeet = state.user?.meetAccess || event.canManageMeet || ["admin", "meet_manager"].includes(state.user?.role);
+  if (event.clubMeet && !canManageMeet) return `<p class="admin-help">${ui("Popis dolazaka vide samo admin i voditelj meetova.", "Only admins and meet managers can see the attendee list.")}</p>`;
+  if (!attendees.length) return `<p class="admin-help">Jos nema prijavljenih dolazaka.</p>`;
+  return attendees.map(item => {
+    const socials = [
+      item.instagram ? `<a href="${socialProfileUrl("instagram", item.instagram)}" target="_blank" rel="noopener">IG: ${escapeHtml(socialHandle(item.instagram))}</a>` : "",
+      item.tiktok ? `<a href="${socialProfileUrl("tiktok", item.tiktok)}" target="_blank" rel="noopener">TT: ${escapeHtml(socialHandle(item.tiktok))}</a>` : ""
+    ].filter(Boolean).join(" ");
+    const images = (item.images || []).length ? `<small>${(item.images || []).length} slika u CSV exportu</small>` : "";
+    return `<div class="attendee-row attendee-row-detailed"><div><strong>${escapeHtml(item.name || "Gost")}</strong>${socials ? `<small>${socials}</small>` : ""}${images}</div><span>${escapeHtml(item.car || "Auto")}</span></div>`;
+  }).join("");
 }
 
 function mapsPageV2() {
@@ -1228,10 +1271,16 @@ function cityEventsPanel(city) {
 }
 
 function eventDetail(event) {
-  const count = (event.attendees || []).length;
+  const count = Number(event.attendeeCount ?? (event.attendees || []).length);
   const member = state.user ? state.data.members.find(item => item.userId === state.user.id) : null;
   const cars = member?.cars || [];
   const isAttending = (event.attendees || []).some(item => item.mine || item.userId === state.user?.id);
+  const canManageMeet = state.user?.meetAccess || event.canManageMeet || ["admin", "meet_manager"].includes(state.user?.role);
+  const canAdminMeet = event.canAdminMeet || state.user?.role === "admin";
+  const clubMeet = Boolean(event.clubMeet);
+  const actions = clubMeet
+    ? `${state.user && (state.user.garageAccess || state.user.role === "admin") ? loggedInAttend(event, cars, isAttending) : state.user ? "" : `<a class="btn" href="/login-clanovi" data-link>${ui("Login za clanove", "Member login")}</a>`}${canManageMeet ? `<button class="btn secondary" data-toggle-attendees="${event.id}">${ui("Popis dolazaka", "Attendee list")} (${count})</button><a class="btn secondary" href="/api/meet-manager/event/export?eventId=${encodeURIComponent(event.id)}">${ui("Download Excel", "Download Excel")}</a>` : ""}`
+    : `${state.user && (state.user.garageAccess || state.user.role === "admin") ? loggedInAttend(event, cars, isAttending) : `<button class="btn" data-attend="${event.id}">${ui("DOLAZIM", "ATTEND")}</button>`}<button class="btn secondary" data-toggle-attendees="${event.id}">${ui("Popis dolazaka", "Attendee list")} (${count})</button>${canAdminMeet ? `<button class="btn secondary" type="button" data-enable-club-meet="${event.id}">${ui("Pretvori u klupski meet", "Make club meet")}</button>` : ""}`;
   return `<div class="event-detail-backdrop" data-close-event></div><article class="event-card event-card-detail" id="${event.id}">
     <button class="map-close event-close" data-close-event aria-label="Zatvori">&times;</button>
     <img src="${event.image || "/assets/hero-night.svg"}" alt="${escapeHtml(event.title)}" />
@@ -1241,8 +1290,8 @@ function eventDetail(event) {
     <p>${escapeHtml(event.description || "")}</p><div class="event-count"><strong>${count}</strong><span> ljudi dolazi</span></div>
     <div class="event-actions">${state.user ? loggedInAttend(event, cars, isAttending) : `<button class="btn" data-attend="${event.id}">DOLAZIM</button>`}<button class="btn secondary" data-toggle-attendees="${event.id}">Popis dolazaka (${count})</button></div>
     <form class="guest-form" data-form="guest-attend" data-event-id="${event.id}" hidden>
-      <label>Ime<input required name="firstName" /></label><label>Prezime<input required name="lastName" /></label>
-      <label>Instagram<input name="instagram" /></label><label>Auto (marka / model / boja)<input required name="car" placeholder="VW Golf, crni" /></label>
+      <label>Ime / nick<input required name="firstName" /></label><label>Prezime<input name="lastName" /></label>
+      <label>Instagram nick<input name="instagram" placeholder="@username" /></label><label>Auto (marka / model / boja)<input required name="car" placeholder="VW Golf, crni" /></label>
       <button class="btn" type="submit">Potvrdi dolazak</button>
     </form><div class="attendee-list" data-attendees="${event.id}" hidden>${attendeeList(event)}</div>
   </article>`;
@@ -1689,12 +1738,13 @@ async function adminPage() {
       <div class="section-head"><h2>${tr("adminTitle")}</h2><p>${tr("dashboard")}: ${dash.members.length} clanova, ${dash.events.length} eventa, ${dash.inbox.length} emailova.</p></div>
       <div class="admin-grid">
         ${adminPanelSwitch()}
+        ${activeUsersPanel(dash.activeUsers || [])}
         <div class="panel admin-wide"><h3>Pristupi korisnika</h3><p class="admin-help">Ovdje mozes urediti rolu, pristupe, cijelu garazu, aute, tekstove ili obrisati cijeli profil.</p><div class="access-admin-list">${dash.users.map(accessUserRow).join("")}</div></div>
         <div class="panel admin-wide"><h3>Upload slika s racunala</h3><form class="admin-form" data-form="upload-image"><label>Odaberi JPG ili PNG<input required type="file" name="image" accept="image/png,image/jpeg" /></label><button class="btn" type="submit">Upload slike</button><label>URL zadnje uploadane slike<input id="uploadResult" readonly placeholder="/uploads/..." /></label><p class="admin-help">Nakon uploada kopiraj URL u polje slike gdje ga zelis koristiti.</p></form></div>
         <div class="panel"><h3>Postavke naslovnice</h3><form class="admin-form" data-form="settings"><label>Broj clanova kluba<input required type="number" name="memberCount" value="${settings.memberCount || 52}" /></label><label>Susreta koji smo posjetili<input required type="number" name="visitedMeetsCount" value="${settings.visitedMeetsCount || 0}" /></label><label>SOON tekst HR<input name="soonTextHr" value="${escapeHtml(settings.soonTextHr || tr("soonMeet"))}" /></label><label>SOON tekst EN<input name="soonTextEn" value="${escapeHtml(settings.soonTextEn || tr("soonMeet"))}" /></label><label>Hero slike, odvojene zarezom<input name="heroImages" value="${escapeHtml((settings.heroImages || []).join(", "))}" /></label><label>O klubu HR<textarea name="aboutHr">${escapeHtml(settings.aboutHr || "")}</textarea></label><label>O klubu EN<textarea name="aboutEn">${escapeHtml(settings.aboutEn || "")}</textarea></label><label>Povijest HR<textarea name="historyHr">${escapeHtml(settings.historyHr || "")}</textarea></label><label>Povijest EN<textarea name="historyEn">${escapeHtml(settings.historyEn || "")}</textarea></label><label>Slike povijesti, odvojene zarezom<input name="historyImages" value="${escapeHtml((settings.historyImages || []).join(", "))}" /></label><button class="btn" type="submit">Spremi postavke</button></form></div>
         <div class="admin-stack">
-          <div class="panel"><h3>${tr("addMember")}</h3><form class="admin-form" data-form="add-member"><label>${tr("email")}<input required type="email" name="email" /></label><label>${tr("tempPassword")}<input name="tempPassword" value="ulaz123ulaz" /></label><button class="btn" type="submit">${tr("addMember")}</button></form></div>
-          <div class="panel"><h3>Reset lozinke clana</h3><form class="admin-form" data-form="reset-password"><label>Email clana<input required type="email" name="email" /></label><label>Nova privremena lozinka<input required name="password" value="ulaz123ulaz" minlength="8" /></label><button class="btn" type="submit">Postavi privremenu lozinku</button></form><p class="admin-help">Admin moze postaviti novu privremenu lozinku, ali ne moze vidjeti staru lozinku.</p></div>
+          ${adminAddUserForm()}
+          <div class="panel"><h3>Reset lozinke korisnika</h3><form class="admin-form" data-form="reset-password"><label>Email ili username<input required name="email" /></label><label>Nova privremena lozinka<input required name="password" value="ulaz123ulaz" minlength="8" /></label><button class="btn" type="submit">Postavi privremenu lozinku</button></form><p class="admin-help">Admin moze postaviti novu privremenu lozinku, ali ne moze vidjeti staru lozinku.</p></div>
         </div>
         <div class="panel admin-wide"><h3>Uredi sve clanove JSON</h3><form class="admin-form" data-form="json-data" data-key="members"><textarea name="json" class="json-editor">${jsonForEdit(dash.members)}</textarea><button class="btn" type="submit">Spremi clanove</button></form></div>
         <div class="panel admin-wide"><h3>Uredi novosti / tekstove</h3><form class="admin-form" data-form="json-data" data-key="posts"><textarea name="json" class="json-editor">${jsonForEdit(dash.posts)}</textarea><button class="btn" type="submit">Spremi novosti</button></form></div>
@@ -1869,6 +1919,21 @@ async function submitForm(form) {
     toast("Event je dodan na kartu.");
     return;
   }
+  if (type === "meet-event") {
+    await api("/api/meet-manager/event", { method: "POST", body: data });
+    form.reset();
+    await refresh();
+    toast("Grupni meet je dodan.");
+    await meetPanelPage();
+    return;
+  }
+  if (type === "meet-attendee-add") {
+    await api("/api/meet-manager/attendee", { method: "PUT", body: { eventId: data.eventId, memberId: data.memberId, action: "add" } });
+    await refresh();
+    toast("Clan je dodan na popis.");
+    await meetPanelPage();
+    return;
+  }
   if (type === "member-attend") {
     await api("/api/event/attend", { method: "POST", body: { eventId: form.dataset.eventId, carId: data.carId } });
     await refresh();
@@ -1881,7 +1946,7 @@ async function submitForm(form) {
     state.user = result.user;
     toast(tr("saved"));
     if (data.loginMode === "admin") {
-      navigate(state.user.role === "admin" ? "/admin" : "/webshop-upravljanje");
+      navigate(state.user.role === "admin" ? "/admin" : state.user.role === "meet_manager" || state.user.meetAccess ? "/meet-panel" : "/webshop-upravljanje");
     } else if (data.loginMode === "shop") {
       navigate(["admin", "shop_manager"].includes(state.user.role) ? "/webshop-upravljanje" : "/webshop");
     } else {
@@ -2058,13 +2123,32 @@ function socialProfileUrl(type, value) {
   return clean;
 }
 
+function socialHandle(value) {
+  const clean = String(value || "").trim();
+  if (!clean) return "";
+  if (/^https?:\/\//i.test(clean)) {
+    const parts = clean.replace(/\/$/, "").split("/");
+    return parts[parts.length - 1] ? `@${parts[parts.length - 1].replace(/^@/, "")}` : clean;
+  }
+  return clean.startsWith("@") ? clean : `@${clean}`;
+}
+
+function imageFileName(url, fallback = "cuneri-slika") {
+  const clean = String(url || "").split("?")[0].split("#")[0];
+  const file = clean.split("/").filter(Boolean).pop() || `${fallback}.jpg`;
+  return file.includes(".") ? file : `${file}.jpg`;
+}
+
 function memberSocialLinks(member) {
   const items = [
     ["instagram", "Instagram", member.instagram],
     ["tiktok", "TikTok", member.tiktok]
   ].filter(([, , value]) => String(value || "").trim());
   if (!items.length) return "";
-  return `<div class="garage-socials">${items.map(([type, label, value]) => `<a class="social-link ${type}" href="${socialProfileUrl(type, value)}" target="_blank" rel="noreferrer">${socialSvg(type)}<span>${escapeHtml(String(value).replace(/^https?:\/\/(www\\.)?/, ""))}</span></a>`).join("")}</div>`;
+  return `<div class="garage-socials">${items.map(([type, label, value]) => {
+    const handle = socialHandle(value);
+    return `<span class="social-tools"><a class="social-link ${type}" href="${socialProfileUrl(type, value)}" target="_blank" rel="noreferrer" title="${label}">${socialSvg(type)}<span>${escapeHtml(handle)}</span></a><button class="social-copy" type="button" data-copy-social="${escapeHtml(handle)}">Copy username</button></span>`;
+  }).join("")}</div>`;
 }
 
 function membersPage() {
@@ -2119,6 +2203,7 @@ function openMember(id) {
   if (!member || !detail) return;
   const cars = memberCars(member);
   const heroCar = cars[0] || {};
+  const allImages = cars.flatMap(carImageList).filter((item, index, list) => list.indexOf(item) === index);
   detail.innerHTML = `
     <div class="detail-backdrop" data-close-detail></div>
     <div class="detail-inner garage-detail">
@@ -2130,6 +2215,7 @@ function openMember(id) {
           <h2>${escapeHtml(member.name)}</h2>
           <p>${escapeHtml(localizedField(member, "bio") || ui("Profil clana i njegovi auti.", "Member profile and cars."))}</p>
           ${memberSocialLinks(member)}
+          ${allImages.length ? `<button class="btn secondary" type="button" data-download-images="${escapeHtml(allImages.join("|"))}">${ui("Download sve slike", "Download all images")}</button>` : ""}
           <div class="garage-tags">
             ${localizedField(member, "competitions") ? `<em>${escapeHtml(localizedField(member, "competitions"))}</em>` : ""}
           </div>
@@ -2149,7 +2235,7 @@ function openMember(id) {
               </dl>
             </div>
             <div class="gallery garage-gallery">
-              ${images.map(img => `<img src="${img}" alt="${escapeHtml(car.name || member.name)}" />`).join("")}
+              ${images.map(img => `<figure class="downloadable-image"><img src="${img}" alt="${escapeHtml(car.name || member.name)}" /><a class="image-download" href="${img}" download="${escapeHtml(imageFileName(img, car.name || member.name))}">Download</a></figure>`).join("")}
             </div>
           </article>`;
         }).join("")}
@@ -2195,28 +2281,35 @@ function cityEventsPanel(city) {
 }
 
 function eventDetail(event) {
-  const count = (event.attendees || []).length;
+  const count = Number(event.attendeeCount ?? (event.attendees || []).length);
   const member = state.user ? state.data.members.find(item => item.userId === state.user.id) : null;
   const cars = member?.cars || [];
   const isAttending = (event.attendees || []).some(item => item.mine || item.userId === state.user?.id);
+  const canManageMeet = state.user?.meetAccess || event.canManageMeet || ["admin", "meet_manager"].includes(state.user?.role);
+  const canAdminMeet = event.canAdminMeet || state.user?.role === "admin";
+  const clubMeet = Boolean(event.clubMeet);
+  const actions = clubMeet
+    ? `${state.user && (state.user.garageAccess || state.user.role === "admin") ? loggedInAttend(event, cars, isAttending) : state.user ? "" : `<a class="btn" href="/login-clanovi" data-link>${ui("Login za clanove", "Member login")}</a>`}${canManageMeet ? `<button class="btn secondary" data-toggle-attendees="${event.id}">${ui("Popis dolazaka", "Attendee list")} (${count})</button><a class="btn secondary" href="/api/meet-manager/event/export?eventId=${encodeURIComponent(event.id)}">${ui("Download Excel", "Download Excel")}</a>` : ""}`
+    : `${state.user && (state.user.garageAccess || state.user.role === "admin") ? loggedInAttend(event, cars, isAttending) : `<button class="btn" data-attend="${event.id}">${ui("DOLAZIM", "ATTEND")}</button>`}<button class="btn secondary" data-toggle-attendees="${event.id}">${ui("Popis dolazaka", "Attendee list")} (${count})</button>${canAdminMeet ? `<button class="btn secondary" type="button" data-enable-club-meet="${event.id}">${ui("Pretvori u klupski meet", "Make club meet")}</button>` : ""}`;
   return `<div class="event-detail-backdrop" data-close-event></div><article class="event-card event-card-detail" id="${event.id}">
     <button class="map-close event-close" data-close-event aria-label="${tr("close")}">&times;</button>
     <img src="${event.image || "/assets/hero-night.svg"}" alt="${escapeHtml(localizedField(event, "title"))}" />
     <h3>${escapeHtml(localizedField(event, "title"))}</h3>
     <div class="event-date">${escapeHtml(event.date)} &middot; ${escapeHtml(event.time || "")} &middot; ${escapeHtml(event.city || "")}</div>
     ${event.location || event.address ? `<p class="event-location">${escapeHtml(localizedField(event, "location") || event.address)}</p>` : ""}
-    <p>${escapeHtml(localizedField(event, "description"))}</p><div class="event-count"><strong>${count}</strong><span> ${ui("ljudi dolazi", "people attending")}</span></div>
-    <div class="event-actions">${state.user ? loggedInAttend(event, cars, isAttending) : `<button class="btn" data-attend="${event.id}">${ui("DOLAZIM", "ATTEND")}</button>`}<button class="btn secondary" data-toggle-attendees="${event.id}">${ui("Popis dolazaka", "Attendee list")} (${count})</button></div>
-    <form class="guest-form" data-form="guest-attend" data-event-id="${event.id}" hidden>
-      <label>${tr("name")}<input required name="firstName" /></label><label>${tr("lastName")}<input required name="lastName" /></label>
-      <label>Instagram<input name="instagram" /></label><label>${ui("Auto (marka / model / boja)", "Car (make / model / color)")}<input required name="car" placeholder="${ui("VW Golf, crni", "VW Golf, black")}" /></label>
+    <p>${escapeHtml(localizedField(event, "description"))}</p>${clubMeet ? `<div class="event-count"><strong>${count}</strong><span> ${ui("clanova ide", "members attending")}</span></div>` : ""}
+    <div class="event-actions">${actions}</div>
+    ${clubMeet ? "" : `<form class="guest-form" data-form="guest-attend" data-event-id="${event.id}" hidden>
+      <label>${ui("Ime / nick", "Name / nickname")}<input required name="firstName" /></label><label>${tr("lastName")}<input name="lastName" /></label>
+      <label>Instagram nick<input name="instagram" placeholder="@username" /></label><label>${ui("Auto (marka / model / boja)", "Car (make / model / color)")}<input required name="car" placeholder="${ui("VW Golf, crni", "VW Golf, black")}" /></label>
       <button class="btn" type="submit">${ui("Potvrdi dolazak", "Confirm attendance")}</button>
-    </form><div class="attendee-list" data-attendees="${event.id}" hidden>${attendeeList(event)}</div>
+    </form>`}<div class="attendee-list" data-attendees="${event.id}" hidden>${attendeeList(event)}</div>
   </article>`;
 }
 
 function loggedInAttend(event, cars, isAttending) {
   if (isAttending) return `<span class="attending-badge">${ui("Prijavljen/a si", "You are attending")}</span>`;
+  if (!state.user?.garageAccess && state.user?.role !== "admin") return `<span class="attending-badge">${ui("Samo clanovi mogu potvrditi dolazak", "Only members can confirm attendance")}</span>`;
   if (cars.length > 1) return `<form class="member-attend" data-form="member-attend" data-event-id="${event.id}"><label>${ui("Dolazim s automobilom", "I am coming with")}<select required name="carId">${cars.map(car => `<option value="${car.id}">${escapeHtml(car.name)}</option>`).join("")}</select></label><button class="btn" type="submit">${ui("DOLAZIM", "ATTEND")}</button></form>`;
   return `<button class="btn" data-attend="${event.id}">${ui("DOLAZIM", "ATTEND")}${cars[0] ? ` &middot; ${escapeHtml(cars[0].name)}` : ""}</button>`;
 }
@@ -2366,16 +2459,69 @@ function accessLoginPage(mode) {
   app.innerHTML = `<section class="login-shell access-login"><div class="access-login-grid"><div class="login-box"><span class="kicker">${kicker}</span><h1>${title}</h1><p>${text}</p><form class="admin-form" data-form="login"><input type="hidden" name="loginMode" value="${mode}" /><label>Email / username<input required name="username" /></label><label>${tr("password")}<input required type="password" name="password" /></label><button class="btn">${tr("login")}</button></form><div class="login-links">${secondaryLinks}</div></div>${isGarage || isAdmin ? "" : `<div class="login-side"><form class="form-box" data-form="shop-reset"><h3>${ui("Zaboravljena lozinka", "Forgot password")}</h3><label>${tr("email")}<input required type="email" name="email" /></label><button class="btn secondary">${ui("Posalji reset email", "Send reset email")}</button></form><form class="form-box" data-form="shop-register"><h3>${ui("Postani webshop korisnik", "Create webshop account")}</h3><label>${tr("name")}<input required name="firstName" /></label><label>${tr("lastName")}<input required name="lastName" /></label><label>${tr("email")}<input required type="email" name="email" /></label><label>${tr("password")}<input required minlength="8" type="password" name="password" /></label><label>${ui("Ponovi lozinku", "Repeat password")}<input required minlength="8" type="password" name="passwordConfirm" /></label><button class="btn">${ui("Registracija", "Register")}</button></form></div>`}</div></section>`;
 }
 
+async function meetPanelPage() {
+  if (!state.user) return accessLoginPage("admin");
+  if (!["admin", "meet_manager"].includes(state.user.role) && !state.user.meetAccess) return errorPage(403, "Nemas pristup meet panelu.");
+  const canAdminMeet = state.user.role === "admin";
+  const data = await api("/api/meet-manager");
+  app.innerHTML = `<section class="section alt meet-admin-page" style="padding-top:128px">
+    <div class="section-head"><h2>Meet panel</h2><p>Digitalni popis clanova za meetove gdje Cuneri idu kao grupa.</p></div>
+    <div class="admin-grid">
+      ${adminPanelSwitch()}
+      ${canAdminMeet ? `<div class="panel admin-wide">
+        <h3>Dodaj grupni meet</h3>
+        <form class="admin-form public-event-form" data-form="meet-event">
+          <label>Naziv meet-a<input required name="title" /></label>
+          <label>Grad<input name="city" /></label>
+          <label class="wide">Lokacija<input required name="location" /></label>
+          <label>Datum<input required type="date" name="date" /></label>
+          <label>Vrijeme<input required type="time" name="time" /></label>
+          <label class="wide">Opis<textarea name="description" placeholder="Npr. okupljanje u 17:00, polazak zajedno..."></textarea></label>
+          <button class="btn wide" type="submit">Dodaj meet za popis</button>
+        </form>
+      </div>` : `<div class="panel admin-wide"><h3>Meet organizer pristup</h3><p class="admin-help">Ovaj pristup sluzi samo za pregled popisa i download Excelice. Samo admin moze dodavati klupske meetove ili mijenjati popis clanova.</p></div>`}
+      ${data.events.map(event => meetPanelEvent(event, data.members, canAdminMeet)).join("") || `<div class="panel admin-wide"><h3>Nema grupnih meetova</h3><p class="admin-help">${canAdminMeet ? "Dodaj prvi grupni meet gore ili u JSON eventa postavi \"clubMeet\": true." : "Admin jos nije dodao klupski meet."}</p></div>`}
+    </div>
+  </section>`;
+}
+
+function meetPanelEvent(event, members, canAdminMeet = false) {
+  const attendees = event.attendees || [];
+  const attendingIds = new Set(attendees.map(item => item.memberId || item.userId));
+  const memberOptions = members
+    .filter(member => !attendingIds.has(member.id) && !attendingIds.has(member.userId))
+    .map(member => `<option value="${member.id}">${escapeHtml(member.name)}${member.email ? ` - ${escapeHtml(member.email)}` : ""}</option>`)
+    .join("");
+  return `<div class="panel admin-wide meet-panel-card">
+    <div class="meet-panel-head">
+      <div><span class="payment-badge">Grupni meet</span><h3>${escapeHtml(localizedField(event, "title"))}</h3><p>${escapeHtml(event.date || "")} ${escapeHtml(event.time || "")} · ${escapeHtml(event.location || event.city || "")}</p></div>
+      <strong>${attendees.length} clanova</strong>
+    </div>
+    <div class="row-actions"><a class="btn secondary" href="/api/meet-manager/event/export?eventId=${encodeURIComponent(event.id)}">Download Excel popisa</a></div>
+    ${canAdminMeet ? `<form class="admin-form meet-add-form" data-form="meet-attendee-add">
+      <input type="hidden" name="eventId" value="${event.id}" />
+      <label>Dodaj clana<select required name="memberId">${memberOptions || `<option value="">Svi clanovi su vec dodani</option>`}</select></label>
+      <button class="btn secondary" ${memberOptions ? "" : "disabled"}>Dodaj na popis</button>
+    </form>` : ""}
+    <div class="meet-attendee-list">
+      ${attendees.map((item, index) => `<div class="attendee-row meet-attendee-row"><strong>${index + 1}. ${escapeHtml(item.name || "Clan")}</strong><span>${escapeHtml(item.car || "Auto clana")}</span>${canAdminMeet ? `<button class="btn danger" type="button" data-meet-remove="${event.id}" data-attendee-id="${item.id}" data-member-id="${item.memberId || ""}">Makni</button>` : ""}</div>`).join("") || `<p class="admin-help">Jos nitko nije na popisu.</p>`}
+    </div>
+  </div>`;
+}
+
 function adminPanelSwitch() {
   if (!state.user) return "";
   const canShop = state.user.shopAccess || ["admin", "shop_manager"].includes(state.user.role);
   const canAdmin = state.user.role === "admin";
+  const canMeet = state.user.meetAccess || ["admin", "meet_manager"].includes(state.user.role);
   const path = location.pathname.replace(/\/$/, "") || "/";
   const adminActive = path === "/admin";
   const shopActive = path === "/webshop-upravljanje";
+  const meetActive = path === "/meet-panel";
   const links = [
     canAdmin ? `<a class="btn ${adminActive ? "" : "secondary"}" href="/admin" data-link>${ui("Admin panel", "Admin panel")}</a>` : "",
-    canShop ? `<a class="btn ${shopActive ? "" : "secondary"}" href="/webshop-upravljanje" data-link>${ui("Webshop panel", "Webshop panel")}</a>` : ""
+    canShop ? `<a class="btn ${shopActive ? "" : "secondary"}" href="/webshop-upravljanje" data-link>${ui("Webshop panel", "Webshop panel")}</a>` : "",
+    canMeet ? `<a class="btn ${meetActive ? "" : "secondary"}" href="/meet-panel" data-link>${ui("Meet panel", "Meet panel")}</a>` : ""
   ].filter(Boolean).join("");
   return links ? `<div class="panel admin-wide panel-switch"><h3>${ui("Paneli", "Panels")}</h3><p>${ui("Prikazuju se samo paneli za koje ovaj email ima pristup.", "Only panels this email can access are shown.")}</p><div class="row-actions">${links}</div></div>` : "";
 }
@@ -2407,6 +2553,7 @@ function webshopSeizedOverlay() {
       <span>${ui("WEBSHOP ZAPLIJENJEN", "WEBSHOP SEIZED")}</span>
       <h2>${ui("U izradi je, nema klikanja", "Under construction, no clicking")}</h2>
       <p>${ui("Ekipa slaze artikle, cijene i narudzbe. Webshop admin moze maknuti ovu blokadu u webshop panelu.", "The team is preparing products, prices and orders. A webshop admin can remove this block in the webshop panel.")}</p>
+      <a class="btn seized-home" href="/" data-link>${ui("Povratak na pocetnu", "Back to home")}</a>
     </div>
     <div class="seized-tape tape-bottom">STOP POLICIJA · WEBSHOP U IZRADI · STOP POLICIJA · WEBSHOP U IZRADI · STOP POLICIJA</div>
   </div>`;
@@ -2451,6 +2598,7 @@ function render() {
   else if (path === "/povijest") historyPage();
   else if (path === "/webshop") shopPage().catch(error => toast(error.message));
   else if (path === "/webshop-upravljanje") shopManagePageV2().catch(error => toast(error.message));
+  else if (path === "/meet-panel") meetPanelPage().catch(error => toast(error.message));
   else if (path === "/profil" || path === "/profile") userProfilePage();
   else if (path === "/login" || path === "/webshop-login") accessLoginPage("shop");
   else if (path === "/login-clanovi") accessLoginPage("garage");
@@ -2503,6 +2651,25 @@ document.addEventListener("click", async event => {
     await navigator.clipboard?.writeText("2CV10").catch(() => {});
     const label = document.querySelector("[data-copy-coupon] em");
     if (label) label.textContent = "Kod je kopiran";
+  }
+  const copySocial = event.target.closest("[data-copy-social]");
+  if (copySocial) {
+    await navigator.clipboard?.writeText(copySocial.dataset.copySocial).catch(() => {});
+    toast(`Kopirano: ${copySocial.dataset.copySocial}`);
+  }
+  const downloadImages = event.target.closest("[data-download-images]");
+  if (downloadImages) {
+    downloadImages.dataset.downloadImages.split("|").filter(Boolean).forEach((url, index) => {
+      setTimeout(() => {
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = imageFileName(url, "cuneri-slika");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }, index * 180);
+    });
+    toast("Download slika je pokrenut.");
   }
   if (event.target.closest("[data-cart-open]")) {
     document.querySelector("#cartDrawer")?.removeAttribute("hidden");
@@ -2561,6 +2728,14 @@ document.addEventListener("click", async event => {
     await adminPage();
     return;
   }
+  const meetRemove = event.target.closest("[data-meet-remove]");
+  if (meetRemove) {
+    await api("/api/meet-manager/attendee", { method: "PUT", body: { eventId: meetRemove.dataset.meetRemove, attendeeId: meetRemove.dataset.attendeeId, memberId: meetRemove.dataset.memberId, action: "remove" } });
+    await refresh();
+    toast("Clan je maknut s popisa.");
+    await meetPanelPage();
+    return;
+  }
   if (event.target.closest("[data-shop-order]")) {
     const result = await api("/api/shop/order", { method: "POST", body: { items: state.cart } });
     state.cart = [];
@@ -2579,10 +2754,20 @@ document.addEventListener("click", async event => {
   const eventMore = event.target.closest("[data-event-more]");
   if (eventMore) openEventDetail(eventMore.dataset.eventMore);
   if (event.target.closest("[data-close-event]")) document.querySelector("#eventDetail")?.setAttribute("hidden", "");
+  const enableClubMeet = event.target.closest("[data-enable-club-meet]");
+  if (enableClubMeet) {
+    await api("/api/meet-manager/event", { method: "PUT", body: { eventId: enableClubMeet.dataset.enableClubMeet, clubMeet: true } });
+    await refresh();
+    toast("Digitalni popis je ukljucen za ovaj meet.");
+    openEventDetail(enableClubMeet.dataset.enableClubMeet);
+    return;
+  }
   const attend = event.target.closest("[data-attend]");
   if (attend) {
     const eventId = attend.dataset.attend;
-    if (state.user) {
+    const selectedEvent = state.data.events.find(item => item.id === eventId);
+    const canAttendAsMember = state.user && (selectedEvent?.clubMeet || state.user.garageAccess || state.user.role === "admin");
+    if (canAttendAsMember) {
       await api("/api/event/attend", { method: "POST", body: { eventId } });
       await refresh();
       toast("Dolazak je dodan.");
